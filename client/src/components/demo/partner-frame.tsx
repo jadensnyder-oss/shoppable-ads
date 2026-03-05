@@ -11,10 +11,7 @@ interface PartnerFrameProps {
 
 function buildIframeHtml(
   html: string,
-  pageType: "checkout" | "confirmation",
-  addedToOrder?: boolean,
-  salePrice?: string | null,
-  productTitle?: string | null
+  pageType: "checkout" | "confirmation"
 ): string {
   const responsiveCSS = `
     <style>
@@ -157,13 +154,7 @@ export function PartnerFrame({
     }
   }, [pageType, addedToOrder, config]);
 
-  const srcDoc = buildIframeHtml(
-    html,
-    pageType,
-    addedToOrder,
-    config.advertiser.productSalePrice,
-    config.advertiser.productTitle
-  );
+  const srcDoc = buildIframeHtml(html, pageType);
 
   return (
     <iframe

@@ -65,6 +65,10 @@ function ImageCarousel({ images }: { images: string[] }) {
   const [current, setCurrent] = useState(0);
   const displayImages = images.length > 0 ? images : [];
 
+  useEffect(() => {
+    setCurrent((prev) => Math.min(prev, Math.max(0, displayImages.length - 1)));
+  }, [displayImages.length]);
+
   const next = useCallback(() => {
     if (displayImages.length > 1) {
       setCurrent((prev) => (prev + 1) % displayImages.length);

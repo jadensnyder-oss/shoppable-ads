@@ -4,7 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
 import { storage } from "./storage";
-import { insertPartnerSchema, partnerToConfig } from "../shared/schema";
+import { insertPartnerSchema, updatePartnerSchema, partnerToConfig } from "../shared/schema";
 import { extractStyles } from "./extraction/style-extractor";
 import { checkFont } from "./extraction/font-checker";
 
@@ -12,11 +12,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const htmlUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
-const imageDir = path.resolve(__dirname, "..", "client", "public", "images", "partners");
+export const UPLOADS_DIR = path.resolve(__dirname, "..", "uploads", "images");
+
 const imageStorage = multer.diskStorage({
   destination: (_req, _file, cb) => {
-    if (!fs.existsSync(imageDir)) fs.mkdirSync(imageDir, { recursive: true });
-    cb(null, imageDir);
+    if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+    cb(null, UPLOADS_DIR);
   },
   filename: (_req, file, cb) => {
     const ext = path.extname(file.originalname);
@@ -33,31 +34,28 @@ const imageUpload = multer({
 });
 
 export function registerRoutes(app: Express): void {
-  // List all partners
   app.get("/api/partners", async (_req: Request, res: Response) => {
     try {
       const allPartners = await storage.getAllPartners();
       const configs = allPartners.map(partnerToConfig);
       res.json(configs);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Failed to fetch partners:", err);
       res.status(500).json({ error: "Failed to fetch partners" });
     }
   });
 
-  // Get single partner
   app.get("/api/partners/:partnerId", async (req: Request, res: Response) => {
     try {
       const partner = await storage.getPartner(req.params.partnerId);
       if (!partner) return res.status(404).json({ error: "Partner not found" });
       res.json(partnerToConfig(partner));
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Failed to fetch partner:", err);
       res.status(500).json({ error: "Failed to fetch partner" });
     }
   });
 
-  // Create partner
   app.post("/api/partners", async (req: Request, res: Response) => {
     try {
       const parsed = insertPartnerSchema.safeParse(req.body);
@@ -66,8 +64,8 @@ export function registerRoutes(app: Express): void {
       }
       const partner = await storage.createPartner(parsed.data);
       res.status(201).json(partnerToConfig(partner));
-    } catch (err: any) {
-      if (err?.code === "23505") {
+    } catch (err: unknown) {
+      if (err instanceof Error && "code" in err && (err as Record<string, unknown>).code === "23505") {
         return res.status(409).json({ error: "Partner ID already exists" });
       }
       console.error("Failed to create partner:", err);
@@ -75,31 +73,32 @@ export function registerRoutes(app: Express): void {
     }
   });
 
-  // Update partner
   app.patch("/api/partners/:partnerId", async (req: Request, res: Response) => {
     try {
-      const partner = await storage.updatePartner(req.params.partnerId, req.body);
+      const parsed = updatePartnerSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: parsed.error.flatten() });
+      }
+      const partner = await storage.updatePartner(req.params.partnerId, parsed.data);
       if (!partner) return res.status(404).json({ error: "Partner not found" });
       res.json(partnerToConfig(partner));
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Failed to update partner:", err);
       res.status(500).json({ error: "Failed to update partner" });
     }
   });
 
-  // Delete partner
   app.delete("/api/partners/:partnerId", async (req: Request, res: Response) => {
     try {
       const deleted = await storage.deletePartner(req.params.partnerId);
       if (!deleted) return res.status(404).json({ error: "Partner not found" });
       res.json({ success: true });
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Failed to delete partner:", err);
       res.status(500).json({ error: "Failed to delete partner" });
     }
   });
 
-  // Upload HTML and extract styles
   app.post(
     "/api/partners/upload-html",
     htmlUpload.single("file"),
@@ -109,37 +108,35 @@ export function registerRoutes(app: Express): void {
         const html = req.file.buffer.toString("utf-8");
         const result = await extractStyles(html);
         res.json({ html, extraction: result });
-      } catch (err) {
+      } catch (err: unknown) {
         console.error("Failed to process HTML:", err);
         res.status(500).json({ error: "Failed to process HTML upload" });
       }
     }
   );
 
-  // Upload image
   app.post(
     "/api/partners/upload-image",
     imageUpload.single("image"),
     async (req: Request, res: Response) => {
       try {
         if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-        const url = `/images/partners/${req.file.filename}`;
+        const url = `/uploads/images/${req.file.filename}`;
         res.json({ url });
-      } catch (err) {
+      } catch (err: unknown) {
         console.error("Failed to upload image:", err);
         res.status(500).json({ error: "Failed to upload image" });
       }
     }
   );
 
-  // Check font availability
   app.post("/api/partners/check-font", async (req: Request, res: Response) => {
     try {
       const { fontFamily } = req.body;
       if (!fontFamily) return res.status(400).json({ error: "fontFamily required" });
       const result = await checkFont(fontFamily);
       res.json(result);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Failed to check font:", err);
       res.status(500).json({ error: "Failed to check font" });
     }

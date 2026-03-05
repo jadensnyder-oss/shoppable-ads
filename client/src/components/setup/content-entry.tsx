@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Upload, X, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 interface ContentEntryProps {
   values: {
@@ -52,6 +53,7 @@ export function ContentEntry({ values, onChange }: ContentEntryProps) {
       update("productImages", [...values.productImages, data.url]);
     } catch (err) {
       console.error("Image upload failed:", err);
+      toast.error("Image upload failed. Please try again.");
     }
   };
 
@@ -195,7 +197,7 @@ export function ContentEntry({ values, onChange }: ContentEntryProps) {
         <div className="flex flex-wrap gap-2">
           {values.badges.map((badge, i) => (
             <span
-              key={i}
+              key={`${badge}-${i}`}
               className="inline-flex items-center gap-1 px-2 py-1 bg-muted rounded-full text-xs font-medium"
             >
               {badge}

@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import { registerRoutes } from "./routes";
+import { registerRoutes, UPLOADS_DIR } from "./routes";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -13,6 +13,7 @@ app.use(
   "/images",
   express.static(path.resolve(__dirname, "..", "client", "public", "images"))
 );
+app.use("/uploads/images", express.static(UPLOADS_DIR));
 
 registerRoutes(app);
 

@@ -23,7 +23,7 @@ async function buildAll() {
     platform: "node",
     format: "cjs",
     bundle: true,
-    external: ["pg-native", "better-sqlite3"],
+    external: [],
     target: "node20",
     sourcemap: true,
   });

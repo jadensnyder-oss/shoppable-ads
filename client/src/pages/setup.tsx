@@ -47,6 +47,7 @@ interface FormState {
   buttonBorderRadius: string;
   buttonBorder: string;
   headerBgColor: string;
+  headerBgImage: string;
   confirmationText: string;
   advertiserBrand: string;
   productTitle: string;
@@ -81,6 +82,7 @@ const defaultForm: FormState = {
   buttonBorderRadius: "100px",
   buttonBorder: "none",
   headerBgColor: "#ffffff",
+  headerBgImage: "",
   confirmationText: "Your order was placed!",
   advertiserBrand: "",
   productTitle: "",
@@ -115,7 +117,7 @@ function formToConfig(form: FormState): PartnerConfig {
       buttonBorderRadius: form.buttonBorderRadius,
       buttonBorder: form.buttonBorder,
       headerBgColor: form.headerBgColor,
-      headerBgImage: null,
+      headerBgImage: form.headerBgImage || null,
       checkoutHtml: form.checkoutHtml || null,
       confirmationHtml: form.confirmationHtml || null,
       confirmationText: form.confirmationText,
@@ -178,6 +180,7 @@ export default function Setup() {
         buttonBorderRadius: p.buttonBorderRadius,
         buttonBorder: p.buttonBorder,
         headerBgColor: p.headerBgColor,
+        headerBgImage: p.headerBgImage || "",
         confirmationText: p.confirmationText,
         advertiserBrand: a.brandName || "",
         productTitle: a.productTitle || "",
@@ -214,6 +217,7 @@ export default function Setup() {
         buttonBorderRadius: data.buttonBorderRadius,
         buttonBorder: data.buttonBorder,
         headerBgColor: data.headerBgColor,
+        headerBgImage: data.headerBgImage || null,
         checkoutHtml: data.checkoutHtml || null,
         confirmationHtml: data.confirmationHtml || null,
         confirmationText: data.confirmationText,
@@ -322,10 +326,13 @@ export default function Setup() {
             </h2>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground" role="tablist" aria-label="Setup steps">
             {STEPS.map((s, i) => (
               <button
                 key={s}
+                role="tab"
+                aria-selected={s === step}
+                aria-label={`Step ${i + 1}: ${STEP_LABELS[s]}`}
                 onClick={() => setStep(s)}
                 className={`cursor-pointer transition-colors ${
                   s === step

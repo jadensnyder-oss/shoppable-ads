@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Plus, Play, Settings, Trash2 } from "lucide-react";
@@ -10,6 +11,7 @@ import { toast } from "sonner";
 export default function Home() {
   const [, navigate] = useLocation();
   const queryClient = useQueryClient();
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
   const { data: partners = [], isLoading } = useQuery<PartnerConfig[]>({
     queryKey: ["partners"],
@@ -184,21 +186,35 @@ export default function Home() {
                       >
                         <Settings className="w-4 h-4" />
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                          if (
-                            confirm(
-                              `Delete ${config.partner.name}?`
-                            )
-                          ) {
-                            deleteMutation.mutate(config.partner.id);
-                          }
-                        }}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      {confirmDelete === config.partner.id ? (
+                        <div className="flex gap-1">
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => {
+                              deleteMutation.mutate(config.partner.id);
+                              setConfirmDelete(null);
+                            }}
+                          >
+                            Delete
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setConfirmDelete(null)}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setConfirmDelete(config.partner.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </CardContent>

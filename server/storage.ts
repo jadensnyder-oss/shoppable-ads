@@ -47,7 +47,7 @@ class FileStorage implements IStorage {
   async createPartner(data: InsertPartner): Promise<Partner> {
     const partners = readPartners();
     if (partners.find((p) => p.partnerId === data.partnerId)) {
-      const err: any = new Error("Partner ID already exists");
+      const err = new Error("Partner ID already exists") as Error & { code: string };
       err.code = "23505";
       throw err;
     }

@@ -1,64 +1,59 @@
-import {
-  pgTable,
-  text,
-  integer,
-  timestamp,
-  jsonb,
-} from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const partners = pgTable("partners", {
-  partnerId: text("partner_id").primaryKey(),
-  name: text("name").notNull(),
-  logo: text("logo"),
+export const partnerSchema = z.object({
+  partnerId: z.string(),
+  name: z.string(),
+  logo: z.string().nullable().default(null),
 
-  primaryColor: text("primary_color").default("#1a1a1a"),
-  secondaryColor: text("secondary_color").default("#f6f6f6"),
-  backgroundColor: text("background_color").default("#ffffff"),
-  fontFamily: text("font_family").default("Inter"),
-  fontFamilyFallback: text("font_family_fallback"),
-  borderRadius: text("border_radius").default("8px"),
-  boxShadow: text("box_shadow"),
-  buttonBgColor: text("button_bg_color").default("#1a1a1a"),
-  buttonTextColor: text("button_text_color").default("#ffffff"),
-  buttonBorderRadius: text("button_border_radius").default("100px"),
-  buttonBorder: text("button_border").default("none"),
+  primaryColor: z.string().default("#1a1a1a"),
+  secondaryColor: z.string().default("#f6f6f6"),
+  backgroundColor: z.string().default("#ffffff"),
+  fontFamily: z.string().default("Inter"),
+  fontFamilyFallback: z.string().nullable().default(null),
+  borderRadius: z.string().default("8px"),
+  boxShadow: z.string().nullable().default(null),
+  buttonBgColor: z.string().default("#1a1a1a"),
+  buttonTextColor: z.string().default("#ffffff"),
+  buttonBorderRadius: z.string().default("100px"),
+  buttonBorder: z.string().default("none"),
 
-  headerBgColor: text("header_bg_color").default("#ffffff"),
-  headerBgImage: text("header_bg_image"),
+  headerBgColor: z.string().default("#ffffff"),
+  headerBgImage: z.string().nullable().default(null),
 
-  checkoutHtml: text("checkout_html"),
-  confirmationHtml: text("confirmation_html"),
-  confirmationText: text("confirmation_text").default(
-    "Your order was placed!"
-  ),
+  checkoutHtml: z.string().nullable().default(null),
+  confirmationHtml: z.string().nullable().default(null),
+  confirmationText: z.string().default("Your order was placed!"),
 
-  advertiserBrand: text("advertiser_brand"),
-  advertiserLogo: text("advertiser_logo"),
-  productTitle: text("product_title"),
-  productImage: text("product_image"),
-  productImages: jsonb("product_images").$type<string[]>().default([]),
-  productPrice: text("product_price"),
-  productSalePrice: text("product_sale_price"),
-  productDiscount: text("product_discount"),
-  productDescription: text("product_description"),
-  ctaButtonText: text("cta_button_text").default("Add to order"),
-  countdownSeconds: integer("countdown_seconds").default(300),
-  badges: jsonb("badges").$type<string[]>().default([]),
-  variants: jsonb("variants")
-    .$type<{ label: string; options: string[] }[]>()
+  advertiserBrand: z.string().nullable().default(null),
+  advertiserLogo: z.string().nullable().default(null),
+  productTitle: z.string().nullable().default(null),
+  productImage: z.string().nullable().default(null),
+  productImages: z.array(z.string()).default([]),
+  productPrice: z.string().nullable().default(null),
+  productSalePrice: z.string().nullable().default(null),
+  productDiscount: z.string().nullable().default(null),
+  productDescription: z.string().nullable().default(null),
+  ctaButtonText: z.string().default("Add to order"),
+  countdownSeconds: z.number().default(300),
+  badges: z.array(z.string()).default([]),
+  variants: z
+    .array(z.object({ label: z.string(), options: z.array(z.string()) }))
     .default([]),
-  soldBy: text("sold_by"),
+  soldBy: z.string().nullable().default(null),
 
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: z.coerce.date().default(() => new Date()),
+  updatedAt: z.coerce.date().default(() => new Date()),
 });
 
-export const insertPartnerSchema = createInsertSchema(partners);
+export const insertPartnerSchema = partnerSchema.omit({
+  createdAt: true,
+  updatedAt: true,
+});
 
-export type Partner = typeof partners.$inferSelect;
-export type InsertPartner = typeof partners.$inferInsert;
+export const updatePartnerSchema = insertPartnerSchema.partial();
+
+export type Partner = z.infer<typeof partnerSchema>;
+export type InsertPartner = z.infer<typeof insertPartnerSchema>;
 
 export interface PartnerConfig {
   partner: {
@@ -106,38 +101,37 @@ export function partnerToConfig(p: Partner): PartnerConfig {
       id: p.partnerId,
       name: p.name,
       logo: p.logo,
-      primaryColor: p.primaryColor || "#1a1a1a",
-      secondaryColor: p.secondaryColor || "#f6f6f6",
-      backgroundColor: p.backgroundColor || "#ffffff",
-      fontFamily: p.fontFamily || "Inter",
+      primaryColor: p.primaryColor,
+      secondaryColor: p.secondaryColor,
+      backgroundColor: p.backgroundColor,
+      fontFamily: p.fontFamily,
       fontFamilyFallback: p.fontFamilyFallback,
-      borderRadius: p.borderRadius || "8px",
+      borderRadius: p.borderRadius,
       boxShadow: p.boxShadow,
-      buttonBgColor: p.buttonBgColor || "#1a1a1a",
-      buttonTextColor: p.buttonTextColor || "#ffffff",
-      buttonBorderRadius: p.buttonBorderRadius || "100px",
-      buttonBorder: p.buttonBorder || "none",
-      headerBgColor: p.headerBgColor || "#ffffff",
+      buttonBgColor: p.buttonBgColor,
+      buttonTextColor: p.buttonTextColor,
+      buttonBorderRadius: p.buttonBorderRadius,
+      buttonBorder: p.buttonBorder,
+      headerBgColor: p.headerBgColor,
       headerBgImage: p.headerBgImage,
       checkoutHtml: p.checkoutHtml,
       confirmationHtml: p.confirmationHtml,
-      confirmationText: p.confirmationText || "Your order was placed!",
+      confirmationText: p.confirmationText,
     },
     advertiser: {
       brandName: p.advertiserBrand,
       brandLogo: p.advertiserLogo,
       productTitle: p.productTitle,
       productImage: p.productImage,
-      productImages: (p.productImages as string[]) || [],
+      productImages: p.productImages,
       productPrice: p.productPrice,
       productSalePrice: p.productSalePrice,
       productDiscount: p.productDiscount,
       productDescription: p.productDescription,
-      ctaButtonText: p.ctaButtonText || "Add to order",
-      countdownSeconds: p.countdownSeconds || 300,
-      badges: (p.badges as string[]) || [],
-      variants:
-        (p.variants as { label: string; options: string[] }[]) || [],
+      ctaButtonText: p.ctaButtonText,
+      countdownSeconds: p.countdownSeconds,
+      badges: p.badges,
+      variants: p.variants,
       soldBy: p.soldBy,
     },
   };
@@ -145,25 +139,13 @@ export function partnerToConfig(p: Partner): PartnerConfig {
 
 export const extractedStylesSchema = z.object({
   primaryColor: z
-    .object({
-      value: z.string(),
-      confidence: z.number(),
-      source: z.string(),
-    })
+    .object({ value: z.string(), confidence: z.number(), source: z.string() })
     .optional(),
   secondaryColor: z
-    .object({
-      value: z.string(),
-      confidence: z.number(),
-      source: z.string(),
-    })
+    .object({ value: z.string(), confidence: z.number(), source: z.string() })
     .optional(),
   backgroundColor: z
-    .object({
-      value: z.string(),
-      confidence: z.number(),
-      source: z.string(),
-    })
+    .object({ value: z.string(), confidence: z.number(), source: z.string() })
     .optional(),
   fontFamily: z
     .object({
