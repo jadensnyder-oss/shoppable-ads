@@ -9,6 +9,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   root: path.resolve(__dirname, "client"),
+  server: {
+    allowedHosts: "all",
+  },
   resolve: {
     alias: {
       "@/": path.resolve(__dirname, "client/src") + "/",
