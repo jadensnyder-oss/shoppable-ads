@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import Home from "./pages/home";
 import Setup from "./pages/setup";
 import Demo from "./pages/demo";
+import TicketmasterDemo from "./pages/ticketmaster-demo";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,6 +21,7 @@ export default function App() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/setup/:partnerId?" component={Setup} />
+        <Route path="/demo/ticketmaster" component={TicketmasterDemo} />
         <Route path="/demo" component={Demo} />
         <Route>
           <div className="flex items-center justify-center min-h-screen">
