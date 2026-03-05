@@ -10,7 +10,7 @@ import { BottomSheet } from "@/components/placement/bottom-sheet";
 import { PartnerFrame } from "@/components/demo/partner-frame";
 import { LoadingScreen } from "@/components/demo/loading-screen";
 import type { PartnerConfig } from "@shared/schema";
-import { apiFetch } from "@/lib/utils";
+import { apiFetch, useCustomFonts } from "@/lib/utils";
 
 type DemoStep =
   | "checkout"
@@ -40,6 +40,8 @@ export default function Demo() {
     queryFn: () => apiFetch(`/api/partners/${partnerId}`),
     enabled: !!partnerId,
   });
+
+  useCustomFonts(config?.partner.customFonts ?? []);
 
   const [currentStep, setCurrentStep] = useState<DemoStep>("checkout");
   const [addedToOrder, setAddedToOrder] = useState(false);

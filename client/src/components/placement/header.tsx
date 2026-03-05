@@ -24,7 +24,7 @@ export function PlacementHeader({ config }: HeaderProps) {
         <img
           src={partner.logo}
           alt={partner.name}
-          className="h-[19px] w-auto object-contain shrink-0"
+          className="h-[24px] max-w-[140px] w-auto object-contain shrink-0"
         />
       ) : (
         <span

@@ -1,12 +1,14 @@
 import type { PartnerConfig } from "@shared/schema";
 import { PlacementHeader } from "@/components/placement/header";
 import { ProductBlock } from "@/components/placement/product-block";
+import { useCustomFonts } from "@/lib/utils";
 
 interface PlacementPreviewProps {
   config: PartnerConfig;
 }
 
 export function PlacementPreview({ config }: PlacementPreviewProps) {
+  useCustomFonts(config.partner.customFonts);
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">

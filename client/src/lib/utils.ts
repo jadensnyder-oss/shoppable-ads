@@ -1,8 +1,35 @@
+import { useEffect } from "react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+export function useCustomFonts(fonts: { name: string; url: string }[]) {
+  useEffect(() => {
+    if (fonts.length === 0) return;
+
+    const id = "custom-font-faces";
+    let style = document.getElementById(id) as HTMLStyleElement | null;
+    if (!style) {
+      style = document.createElement("style");
+      style.id = id;
+      document.head.appendChild(style);
+    }
+
+    const rules = fonts.map((f) => {
+      const ext = f.url.split(".").pop()?.toLowerCase() || "woff2";
+      const format =
+        ext === "woff2" ? "woff2" : ext === "woff" ? "woff" : ext === "otf" ? "opentype" : "truetype";
+      return `@font-face { font-family: '${f.name}'; src: url('${f.url}') format('${format}'); font-display: swap; }`;
+    });
+    style.textContent = rules.join("\n");
+
+    return () => {
+      if (style && style.parentNode) style.parentNode.removeChild(style);
+    };
+  }, [fonts]);
 }
 
 export function isColorDark(hex: string): boolean {

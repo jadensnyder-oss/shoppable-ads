@@ -59,6 +59,7 @@ const stockxPartner: InsertPartner = {
   badges: ["EXCLUSIVE OFFER", "Free Shipping"],
   variants: [{ label: "Select color", options: ["Burnt Clay", "Ocean Blue", "Forest Green"] }],
   soldBy: "Palmes",
+  customFonts: [],
 };
 
 export async function seedDatabase(): Promise<void> {

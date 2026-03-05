@@ -91,9 +91,10 @@ function extractBorderRadius(cssText: string): string | null {
   let match;
   while ((match = pattern.exec(cssText)) !== null) {
     const val = match[1].trim().split(/\s+/)[0];
-    if (val !== "0" && val !== "0px") {
-      values.set(val, (values.get(val) || 0) + 1);
-    }
+    if (val === "0" || val === "0px") continue;
+    // Skip percentage values (50% is circles/avatars, not card radii)
+    if (val.endsWith("%")) continue;
+    values.set(val, (values.get(val) || 0) + 1);
   }
   if (values.size === 0) return null;
   return [...values.entries()].sort((a, b) => b[1] - a[1])[0][0];
@@ -138,7 +139,10 @@ function extractButtonStyles($: cheerio.CheerioAPI): {
       const c = normalizeColor(colorMatch[1]);
       if (c) textColor = c;
     }
-    if (radiusMatch) borderRadius = radiusMatch[1].trim();
+    if (radiusMatch) {
+      const rv = radiusMatch[1].trim();
+      if (!rv.endsWith("%")) borderRadius = rv;
+    }
     if (borderMatch) border = borderMatch[1].trim();
   });
 

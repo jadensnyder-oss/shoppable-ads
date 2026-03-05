@@ -16,7 +16,7 @@ interface HeaderConfig {
 
 function buildStaticHeader(cfg: HeaderConfig): string {
   const logo = cfg.logoUrl
-    ? `<img src="${cfg.logoUrl}" alt="Partner" style="max-height:28px;width:auto;display:block;" />`
+    ? `<img src="${cfg.logoUrl}" alt="Partner" style="max-height:32px;max-width:160px;width:auto;display:block;object-fit:contain;" />`
     : "";
 
   return `
@@ -34,11 +34,24 @@ function buildStaticHeader(cfg: HeaderConfig): string {
   `;
 }
 
+function buildFontFaceCSS(customFonts: { name: string; url: string }[]): string {
+  if (customFonts.length === 0) return "";
+  const rules = customFonts.map((f) => {
+    const ext = f.url.split(".").pop()?.toLowerCase() || "woff2";
+    const format =
+      ext === "woff2" ? "woff2" : ext === "woff" ? "woff" : ext === "otf" ? "opentype" : "truetype";
+    return `@font-face { font-family: '${f.name}'; src: url('${f.url}') format('${format}'); font-display: swap; }`;
+  });
+  return `<style>${rules.join("\n")}</style>`;
+}
+
 function buildIframeHtml(
   html: string,
   pageType: "checkout" | "confirmation",
-  header: HeaderConfig
+  header: HeaderConfig,
+  customFonts: { name: string; url: string }[] = []
 ): string {
+  const fontFaceCSS = buildFontFaceCSS(customFonts);
   const responsiveCSS = `
     <style>
       html, body {
@@ -127,9 +140,9 @@ function buildIframeHtml(
 
   let processed = html;
   if (processed.includes("</head>")) {
-    processed = processed.replace("</head>", responsiveCSS + viewportFix + "</head>");
+    processed = processed.replace("</head>", fontFaceCSS + responsiveCSS + viewportFix + "</head>");
   } else {
-    processed = responsiveCSS + viewportFix + processed;
+    processed = fontFaceCSS + responsiveCSS + viewportFix + processed;
   }
 
   if (processed.includes("<body")) {
@@ -191,10 +204,12 @@ export function PartnerFrame({
     }
   }, [pageType, addedToOrder, config]);
 
-  const srcDoc = buildIframeHtml(html, pageType, {
-    logoUrl: config.partner.logo,
-    bgColor: config.partner.headerBgColor,
-  });
+  const srcDoc = buildIframeHtml(
+    html,
+    pageType,
+    { logoUrl: config.partner.logo, bgColor: config.partner.headerBgColor },
+    config.partner.customFonts
+  );
 
   return (
     <iframe

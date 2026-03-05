@@ -85,6 +85,7 @@ class FileStorage implements IStorage {
       badges: data.badges ?? [],
       variants: data.variants ?? [],
       soldBy: data.soldBy ?? null,
+      customFonts: data.customFonts ?? [],
       createdAt: new Date(),
       updatedAt: new Date(),
     };

@@ -6,7 +6,7 @@ import fs from "fs";
 import { storage } from "./storage";
 import { insertPartnerSchema, updatePartnerSchema, partnerToConfig } from "../shared/schema";
 import { extractStyles } from "./extraction/style-extractor";
-import { cleanHtml } from "./extraction/html-cleaner";
+import { cleanHtml, analyzeHtml, removeSelectors } from "./extraction/html-cleaner";
 import { checkFont } from "./extraction/font-checker";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -14,6 +14,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const htmlUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
 export const UPLOADS_DIR = path.resolve(__dirname, "..", "uploads", "images");
+export const FONTS_DIR = path.resolve(__dirname, "..", "uploads", "fonts");
 
 const imageStorage = multer.diskStorage({
   destination: (_req, _file, cb) => {
@@ -48,7 +49,7 @@ export function registerRoutes(app: Express): void {
 
   app.get("/api/partners/:partnerId", async (req: Request, res: Response) => {
     try {
-      const partner = await storage.getPartner(req.params.partnerId);
+      const partner = await storage.getPartner(req.params.partnerId as string);
       if (!partner) return res.status(404).json({ error: "Partner not found" });
       res.json(partnerToConfig(partner));
     } catch (err: unknown) {
@@ -80,7 +81,7 @@ export function registerRoutes(app: Express): void {
       if (!parsed.success) {
         return res.status(400).json({ error: parsed.error.flatten() });
       }
-      const partner = await storage.updatePartner(req.params.partnerId, parsed.data);
+      const partner = await storage.updatePartner(req.params.partnerId as string, parsed.data);
       if (!partner) return res.status(404).json({ error: "Partner not found" });
       res.json(partnerToConfig(partner));
     } catch (err: unknown) {
@@ -91,7 +92,7 @@ export function registerRoutes(app: Express): void {
 
   app.delete("/api/partners/:partnerId", async (req: Request, res: Response) => {
     try {
-      const deleted = await storage.deletePartner(req.params.partnerId);
+      const deleted = await storage.deletePartner(req.params.partnerId as string);
       if (!deleted) return res.status(404).json({ error: "Partner not found" });
       res.json({ success: true });
     } catch (err: unknown) {
@@ -117,6 +118,32 @@ export function registerRoutes(app: Express): void {
     }
   );
 
+  app.post("/api/partners/analyze-html", async (req: Request, res: Response) => {
+    try {
+      const { html } = req.body;
+      if (!html) return res.status(400).json({ error: "html field required" });
+      const sections = analyzeHtml(html);
+      res.json({ sections });
+    } catch (err: unknown) {
+      console.error("Failed to analyze HTML:", err);
+      res.status(500).json({ error: "Failed to analyze HTML" });
+    }
+  });
+
+  app.post("/api/partners/clean-html", async (req: Request, res: Response) => {
+    try {
+      const { html, selectors } = req.body;
+      if (!html || !Array.isArray(selectors)) {
+        return res.status(400).json({ error: "html and selectors[] required" });
+      }
+      const cleaned = removeSelectors(html, selectors);
+      res.json({ html: cleaned });
+    } catch (err: unknown) {
+      console.error("Failed to clean HTML:", err);
+      res.status(500).json({ error: "Failed to clean HTML" });
+    }
+  });
+
   app.post(
     "/api/partners/upload-image",
     imageUpload.single("image"),
@@ -128,6 +155,43 @@ export function registerRoutes(app: Express): void {
       } catch (err: unknown) {
         console.error("Failed to upload image:", err);
         res.status(500).json({ error: "Failed to upload image" });
+      }
+    }
+  );
+
+  const fontStorage = multer.diskStorage({
+    destination: (_req, _file, cb) => {
+      if (!fs.existsSync(FONTS_DIR)) fs.mkdirSync(FONTS_DIR, { recursive: true });
+      cb(null, FONTS_DIR);
+    },
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname);
+      cb(null, `${Date.now()}${ext}`);
+    },
+  });
+  const fontUpload = multer({
+    storage: fontStorage,
+    limits: { fileSize: 10 * 1024 * 1024 },
+    fileFilter: (_req, file, cb) => {
+      const allowed = [".woff", ".woff2", ".ttf", ".otf"];
+      const ext = path.extname(file.originalname).toLowerCase();
+      if (allowed.includes(ext)) cb(null, true);
+      else cb(new Error("Only font files (woff, woff2, ttf, otf) allowed"));
+    },
+  });
+
+  app.post(
+    "/api/partners/upload-font",
+    fontUpload.single("font"),
+    async (req: Request, res: Response) => {
+      try {
+        if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+        const fontFamily = (req.body.fontFamily as string) || path.parse(req.file.originalname).name;
+        const url = `/uploads/fonts/${req.file.filename}`;
+        res.json({ url, fontFamily });
+      } catch (err: unknown) {
+        console.error("Failed to upload font:", err);
+        res.status(500).json({ error: "Failed to upload font" });
       }
     }
   );

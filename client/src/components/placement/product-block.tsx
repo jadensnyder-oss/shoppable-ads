@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import type { PartnerConfig } from "@shared/schema";
 
+const DESIGN_WIDTH = 393;
+const scale = (px: number) => `clamp(${Math.round(px * 0.75)}px, ${((px / DESIGN_WIDTH) * 100).toFixed(2)}cqw, ${Math.round(px * 1.1)}px)`;
+
 interface ProductBlockProps {
   config: PartnerConfig;
   onAddToOrder: () => void;
@@ -32,26 +35,24 @@ function Countdown({
     <div className="bg-[#fafafa] flex gap-[16px] items-start justify-center px-[16px] py-[14px] relative rounded-[8px] w-full">
       <div className="absolute border border-[#cacaca] border-solid inset-[-0.5px] pointer-events-none rounded-[8.5px]" />
       <div className="flex flex-1 gap-[4px] items-center justify-center text-center">
-        <p className="text-[16px]" style={{ color: primaryColor }}>
+        <p style={{ fontSize: scale(16), color: primaryColor }}>
           <span
-            className="leading-[19px]"
-            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500 }}
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, lineHeight: 1.2 }}
           >
             {"Before you go - here's an exclusive offer for you expiring in "}
           </span>
           <span
-            className="leading-[19px]"
             style={{
               fontFamily: "'Inter', sans-serif",
               fontWeight: 700,
+              lineHeight: 1.2,
               color: primaryColor,
             }}
           >
             {display}
           </span>
           <span
-            className="leading-[19px]"
-            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500 }}
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, lineHeight: 1.2 }}
           >
             .
           </span>
@@ -125,14 +126,15 @@ export function ProductBlock({
     <div
       className="flex flex-col gap-[24px] items-start pb-[32px] pt-[24px] px-[16px] w-full"
       style={{
+        containerType: "inline-size",
         backgroundColor: partner.backgroundColor || "#ffffff",
         fontFamily: `'${partner.fontFamily}', 'Inter', sans-serif`,
       }}
     >
       {/* Confirmation text + Countdown */}
       <div className="flex flex-col gap-[16px] items-start w-full">
-        <p className="font-semibold h-[24px] leading-[1.2] text-[20px] text-center w-full"
-          style={{ fontFamily: "'Inter', sans-serif", color: "#1a1a1a" }}>
+        <p className="font-semibold leading-[1.2] text-center w-full"
+          style={{ fontSize: scale(20), fontFamily: "'Inter', sans-serif", color: "#1a1a1a" }}>
           {partner.confirmationText || "Your order was placed!"}
         </p>
         <Countdown
@@ -150,16 +152,17 @@ export function ProductBlock({
           <div className="flex flex-col gap-[8px] items-start w-full">
             <div className="flex flex-col gap-[8px] items-start w-full">
               {advertiser.badges.length > 0 && (
-                <div className="flex gap-[8px] items-center">
+                <div className="flex gap-[8px] items-center flex-wrap">
                   {advertiser.badges.map((badge) => (
                     <div
                       key={badge}
-                      className="flex h-[22px] items-center justify-center px-[8px] py-[3px] rounded-[500px]"
+                      className="flex items-center justify-center px-[8px] py-[3px] rounded-[500px]"
                       style={{ backgroundColor: partner.secondaryColor || "#cacaca" }}
                     >
                       <span
-                        className="text-[12px] font-semibold uppercase tracking-[0.48px] text-center whitespace-nowrap"
+                        className="font-semibold uppercase tracking-[0.48px] text-center whitespace-nowrap"
                         style={{
+                          fontSize: scale(12),
                           fontFamily: "'Inter', sans-serif",
                           color: "#242424",
                         }}
@@ -173,8 +176,9 @@ export function ProductBlock({
 
               {advertiser.brandName && (
                 <p
-                  className="text-[14px] leading-[19.25px] tracking-[0.064px]"
+                  className="leading-[1.37] tracking-[0.064px]"
                   style={{
+                    fontSize: scale(14),
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 500,
                     color: "#5f5f5f",
@@ -186,8 +190,9 @@ export function ProductBlock({
 
               {advertiser.productTitle && (
                 <p
-                  className="text-[20px] leading-[26px] w-full"
+                  className="leading-[1.3] w-full"
                   style={{
+                    fontSize: scale(20),
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 500,
                     color: "#242424",
@@ -200,11 +205,12 @@ export function ProductBlock({
 
             {/* Pricing */}
             <div className="flex flex-col items-start">
-              <div className="flex gap-[8px] items-center">
+              <div className="flex gap-[8px] items-center flex-wrap">
                 {advertiser.productSalePrice && (
                   <span
-                    className="text-[24px] leading-[31.2px]"
+                    className="leading-[1.3]"
                     style={{
+                      fontSize: scale(24),
                       fontFamily: "'Inter', sans-serif",
                       fontWeight: 500,
                       color: primaryColor,
@@ -217,8 +223,9 @@ export function ProductBlock({
                   advertiser.productSalePrice &&
                   advertiser.productPrice !== advertiser.productSalePrice && (
                     <span
-                      className="text-[24px] leading-[24px] line-through"
+                      className="leading-[1] line-through"
                       style={{
+                        fontSize: scale(24),
                         fontFamily: "'Inter', sans-serif",
                         fontWeight: 500,
                         color: "#cacaca",
@@ -229,14 +236,15 @@ export function ProductBlock({
                   )}
                 {advertiser.productDiscount && (
                   <div
-                    className="flex h-[20px] items-center justify-center px-[8px] py-[3px] rounded-[500px]"
+                    className="flex items-center justify-center px-[8px] py-[3px] rounded-[500px]"
                     style={{
                       backgroundColor: `${primaryColor}15`,
                     }}
                   >
                     <span
-                      className="text-[12px] font-semibold uppercase leading-[18px]"
+                      className="font-semibold uppercase leading-[1.5]"
                       style={{
+                        fontSize: scale(12),
                         fontFamily: "'Inter', sans-serif",
                         color: primaryColor,
                       }}
@@ -253,8 +261,9 @@ export function ProductBlock({
           {advertiser.productDescription && (
             <div className="flex flex-col gap-[8px] items-start w-full">
               <p
-                className="text-[14px] leading-[19.25px] tracking-[0.064px]"
+                className="leading-[1.37] tracking-[0.064px]"
                 style={{
+                  fontSize: scale(14),
                   fontFamily: "'Inter', sans-serif",
                   fontWeight: 500,
                   color: "#242424",
@@ -263,8 +272,9 @@ export function ProductBlock({
                 Product Details
               </p>
               <div
-                className="text-[14px] leading-[20px] tracking-[0.064px] whitespace-pre-line"
+                className="leading-[1.43] tracking-[0.064px] whitespace-pre-line"
                 style={{
+                  fontSize: scale(14),
                   fontFamily: "'Helvetica', 'Inter', sans-serif",
                   fontWeight: 400,
                   color: "#5f5f5f",
@@ -281,11 +291,11 @@ export function ProductBlock({
               {advertiser.variants.map((variant) => (
                 <div key={variant.label} className="w-full">
                   <div className="bg-white h-[44px] rounded-[8px] border border-[#cacaca] flex items-center justify-between px-[12px] w-full">
-                    <div className="flex items-center gap-[6px] text-[14px]">
-                      <span style={{ fontFamily: "'Inter', sans-serif", color: "#242424" }}>
+                    <div className="flex items-center gap-[6px]">
+                      <span style={{ fontSize: scale(14), fontFamily: "'Inter', sans-serif", color: "#242424" }}>
                         {variant.label}:
                       </span>
-                      <span className="font-semibold" style={{ fontFamily: "'Inter', sans-serif", color: "#242424" }}>
+                      <span className="font-semibold" style={{ fontSize: scale(14), fontFamily: "'Inter', sans-serif", color: "#242424" }}>
                         {variant.options[0]}
                       </span>
                     </div>
@@ -304,12 +314,12 @@ export function ProductBlock({
               <div className="w-full h-0 border-t border-[#eaecf0]" />
               <div className="flex items-center w-full">
                 <div className="flex flex-col gap-[3.75px] w-full">
-                  <p className="text-[14px] leading-[19.25px] tracking-[0.064px]"
-                    style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, color: "#242424" }}>
+                  <p className="leading-[1.37] tracking-[0.064px]"
+                    style={{ fontSize: scale(14), fontFamily: "'Inter', sans-serif", fontWeight: 500, color: "#242424" }}>
                     Billing &amp; Shipping Details
                   </p>
-                  <p className="text-[12px] leading-[16.5px] tracking-[0.064px]"
-                    style={{ fontFamily: "'Helvetica', 'Inter', sans-serif", color: "#242424" }}>
+                  <p className="leading-[1.37] tracking-[0.064px]"
+                    style={{ fontSize: scale(12), fontFamily: "'Helvetica', 'Inter', sans-serif", color: "#242424" }}>
                     This item is sold and shipped by{" "}
                     <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500 }}>
                       {advertiser.soldBy}.
@@ -336,8 +346,9 @@ export function ProductBlock({
           }}
         >
           <span
-            className="text-[16px] font-semibold leading-[1.37] whitespace-pre"
+            className="font-semibold leading-[1.37] whitespace-pre"
             style={{
+              fontSize: scale(16),
               fontFamily: "'Inter', sans-serif",
               color: partner.buttonTextColor || "#ffffff",
             }}
@@ -359,8 +370,9 @@ export function ProductBlock({
           }}
         >
           <span
-            className="text-[16px] font-semibold leading-[22px]"
+            className="font-semibold leading-[1.37]"
             style={{
+              fontSize: scale(16),
               fontFamily: "'Inter', sans-serif",
               color: "#000000",
             }}

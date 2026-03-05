@@ -40,6 +40,9 @@ export const partnerSchema = z.object({
     .array(z.object({ label: z.string(), options: z.array(z.string()) }))
     .default([]),
   soldBy: z.string().nullable().default(null),
+  customFonts: z
+    .array(z.object({ name: z.string(), url: z.string() }))
+    .default([]),
 
   createdAt: z.coerce.date().default(() => new Date()),
   updatedAt: z.coerce.date().default(() => new Date()),
@@ -76,6 +79,7 @@ export interface PartnerConfig {
     checkoutHtml: string | null;
     confirmationHtml: string | null;
     confirmationText: string;
+    customFonts: { name: string; url: string }[];
   };
   advertiser: {
     brandName: string | null;
@@ -117,6 +121,7 @@ export function partnerToConfig(p: Partner): PartnerConfig {
       checkoutHtml: p.checkoutHtml,
       confirmationHtml: p.confirmationHtml,
       confirmationText: p.confirmationText,
+      customFonts: p.customFonts,
     },
     advertiser: {
       brandName: p.advertiserBrand,

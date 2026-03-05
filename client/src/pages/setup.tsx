@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useParams } from "wouter";
-import { ArrowLeft, ArrowRight, Check, Upload, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Upload, X, Type } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +11,8 @@ import { AssetUpload } from "@/components/setup/asset-upload";
 import { StyleDiagnosis } from "@/components/setup/style-diagnosis";
 import { ContentEntry } from "@/components/setup/content-entry";
 import { PlacementPreview } from "@/components/setup/placement-preview";
+import { FontPicker } from "@/components/setup/font-picker";
+import { HtmlElementEditor } from "@/components/setup/html-element-editor";
 import type {
   PartnerConfig,
   ExtractedStyles,
@@ -63,6 +65,7 @@ interface FormState {
   badges: string[];
   variants: { label: string; options: string[] }[];
   soldBy: string;
+  customFonts: { name: string; url: string }[];
 }
 
 const defaultForm: FormState = {
@@ -98,6 +101,7 @@ const defaultForm: FormState = {
   badges: [],
   variants: [],
   soldBy: "",
+  customFonts: [],
 };
 
 function formToConfig(form: FormState): PartnerConfig {
@@ -122,6 +126,7 @@ function formToConfig(form: FormState): PartnerConfig {
       checkoutHtml: form.checkoutHtml || null,
       confirmationHtml: form.confirmationHtml || null,
       confirmationText: form.confirmationText,
+      customFonts: form.customFonts,
     },
     advertiser: {
       brandName: form.advertiserBrand || null,
@@ -183,6 +188,7 @@ export default function Setup() {
         headerBgColor: p.headerBgColor,
         headerBgImage: p.headerBgImage || "",
         confirmationText: p.confirmationText,
+        customFonts: p.customFonts || [],
         advertiserBrand: a.brandName || "",
         productTitle: a.productTitle || "",
         productImage: a.productImage || "",
@@ -235,6 +241,7 @@ export default function Setup() {
         badges: data.badges,
         variants: data.variants,
         soldBy: data.soldBy || null,
+        customFonts: data.customFonts,
       };
 
       if (isEditing) {
@@ -391,7 +398,7 @@ export default function Setup() {
             {/* Partner info + Logo */}
             <div className="flex gap-6 items-start">
               <div className="flex flex-col items-center gap-2">
-                <Label className="text-xs">Logo</Label>
+                <Label className="text-xs">Logo (SVG preferred)</Label>
                 {form.logo ? (
                   <div className="relative w-20 h-20 rounded-lg border overflow-hidden bg-white flex items-center justify-center">
                     <img
@@ -476,6 +483,13 @@ export default function Setup() {
               onUpload={handleCheckoutUpload}
               currentHtml={form.checkoutHtml || null}
             />
+            {form.checkoutHtml && (
+              <HtmlElementEditor
+                html={form.checkoutHtml}
+                onHtmlChange={(html) => setForm((prev) => ({ ...prev, checkoutHtml: html }))}
+                label="Checkout"
+              />
+            )}
 
             <HtmlUpload
               label="Confirmation Page"
@@ -483,6 +497,13 @@ export default function Setup() {
               onUpload={handleConfirmationUpload}
               currentHtml={form.confirmationHtml || null}
             />
+            {form.confirmationHtml && (
+              <HtmlElementEditor
+                html={form.confirmationHtml}
+                onHtmlChange={(html) => setForm((prev) => ({ ...prev, confirmationHtml: html }))}
+                label="Confirmation"
+              />
+            )}
 
             <AssetUpload />
           </div>
@@ -506,6 +527,7 @@ export default function Setup() {
                 onDismissFlag={(i) => {
                   setExtractionFlags((prev) => prev.filter((_, idx) => idx !== i));
                 }}
+                customFonts={form.customFonts.map((f) => f.name)}
               />
             ) : (
               <div className="text-center py-12">
@@ -534,14 +556,83 @@ export default function Setup() {
                   </div>
                   <div className="flex flex-col gap-1">
                     <Label className="text-xs">Font</Label>
-                    <Input
+                    <FontPicker
                       value={form.fontFamily}
-                      onChange={(e) => setForm((prev) => ({ ...prev, fontFamily: e.target.value }))}
+                      onChange={(v) => setForm((prev) => ({ ...prev, fontFamily: v }))}
+                      customFonts={form.customFonts.map((f) => f.name)}
                     />
                   </div>
                 </div>
               </div>
             )}
+
+            <div className="border rounded-lg p-4">
+              <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                <Type className="w-4 h-4" />
+                Custom Fonts
+              </h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                Upload custom font files (.woff2, .ttf, .otf) for brands that use licensed fonts
+                not available on Google Fonts.
+              </p>
+              {form.customFonts.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {form.customFonts.map((f, i) => (
+                    <div
+                      key={`${f.name}-${i}`}
+                      className="flex items-center gap-1.5 px-2 py-1 bg-muted rounded text-xs"
+                    >
+                      <span className="font-medium">{f.name}</span>
+                      <button
+                        onClick={() =>
+                          setForm((prev) => ({
+                            ...prev,
+                            customFonts: prev.customFonts.filter((_, idx) => idx !== i),
+                          }))
+                        }
+                        className="text-muted-foreground hover:text-foreground cursor-pointer"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <label className="flex items-center gap-2 px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary/50 transition-colors cursor-pointer w-fit">
+                <Upload className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Upload font file</span>
+                <input
+                  type="file"
+                  accept=".woff,.woff2,.ttf,.otf"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const fontName = prompt("Font family name:", file.name.replace(/\.[^.]+$/, ""));
+                    if (!fontName) return;
+                    const fd = new FormData();
+                    fd.append("font", file);
+                    fd.append("fontFamily", fontName);
+                    try {
+                      const res = await fetch("/api/partners/upload-font", {
+                        method: "POST",
+                        body: fd,
+                      });
+                      if (!res.ok) throw new Error("Upload failed");
+                      const data = await res.json();
+                      setForm((prev) => ({
+                        ...prev,
+                        customFonts: [...prev.customFonts, { name: data.fontFamily, url: data.url }],
+                      }));
+                      toast.success(`Font "${data.fontFamily}" uploaded`);
+                    } catch {
+                      toast.error("Font upload failed");
+                    }
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+            </div>
 
             <div className="border rounded-lg p-4">
               <h3 className="text-sm font-semibold mb-3">Demo Page Header</h3>
