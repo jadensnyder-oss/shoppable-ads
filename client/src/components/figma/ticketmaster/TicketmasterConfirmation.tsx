@@ -1,7 +1,7 @@
 import svgPaths from "./svg-confirmation";
-const imgCardsNoElevation43Image = "/images/ticketmaster/concert-placeholder.png";
-const imgCardsNoElevation43Image1 = "/images/ticketmaster/concert-placeholder.png";
-const imgCardsNoElevation43Image2 = "/images/ticketmaster/concert-placeholder.png";
+const imgCardsNoElevation43Image = "/images/ticketmaster/concert.png";
+const imgCardsNoElevation43Image1 = "/images/ticketmaster/concert.png";
+const imgCardsNoElevation43Image2 = "/images/ticketmaster/concert.png";
 import { imgFillWhite, imgGroup } from "./svg-confirmation-data";
 
 function Group14() {

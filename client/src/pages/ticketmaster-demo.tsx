@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Home, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LoadingScreen } from "@/components/demo/loading-screen";
+import CheckoutView from "@/components/figma/ticketmaster/CheckoutView";
 import InterstitialView from "@/components/figma/ticketmaster/InterstitialView";
 import PaymentSheet from "@/components/figma/ticketmaster/PaymentSheet";
 import TicketmasterConfirmation from "@/components/figma/ticketmaster/TicketmasterConfirmation";
@@ -11,11 +12,11 @@ import TicketmasterLoader from "@/components/figma/ticketmaster/TicketmasterLoad
 import "@/components/figma/ticketmaster/fonts.css";
 
 type DemoStep =
-  | "confirmation"
+  | "checkout"
   | "loading"
   | "interstitial"
   | "confirmLoading"
-  | "finalConfirmation";
+  | "confirmation";
 
 const dissolve = {
   initial: { opacity: 0 },
@@ -52,17 +53,21 @@ function ConfirmLoadingStep({ onComplete }: { onComplete: () => void }) {
 
 export default function TicketmasterDemo() {
   const [, navigate] = useLocation();
-  const [currentStep, setCurrentStep] = useState<DemoStep>("confirmation");
-  const [addedToOrder, setAddedToOrder] = useState(false);
+  const [currentStep, setCurrentStep] = useState<DemoStep>("checkout");
   const [showBottomSheet, setShowBottomSheet] = useState(false);
 
   const resetDemo = useCallback(() => {
-    setCurrentStep("confirmation");
-    setAddedToOrder(false);
+    setCurrentStep("checkout");
     setShowBottomSheet(false);
   }, []);
 
-  const handleContinueFromConfirmation = useCallback(() => {
+  useEffect(() => {
+    if (currentStep !== "interstitial") {
+      setShowBottomSheet(false);
+    }
+  }, [currentStep]);
+
+  const handlePlaceOrder = useCallback(() => {
     setCurrentStep("loading");
   }, []);
 
@@ -75,27 +80,24 @@ export default function TicketmasterDemo() {
   }, []);
 
   const handleConfirmOrder = useCallback(() => {
-    setShowBottomSheet(false);
-    setAddedToOrder(true);
     setCurrentStep("confirmLoading");
   }, []);
 
   const handleDecline = useCallback(() => {
-    setAddedToOrder(false);
-    setCurrentStep("finalConfirmation");
+    setCurrentStep("confirmation");
   }, []);
 
   const handleConfirmLoadingComplete = useCallback(() => {
-    setCurrentStep("finalConfirmation");
+    setCurrentStep("confirmation");
   }, []);
 
   const stepLabel = (() => {
     switch (currentStep) {
-      case "confirmation": return "Order Confirmation";
+      case "checkout": return "Checkout";
       case "loading": return "Loading...";
       case "interstitial": return "Special Offer";
       case "confirmLoading": return "Processing...";
-      case "finalConfirmation": return "Order Summary";
+      case "confirmation": return "Order Confirmed";
     }
   })();
 
@@ -135,25 +137,13 @@ export default function TicketmasterDemo() {
         }}
       >
         <AnimatePresence mode="wait">
-          {currentStep === "confirmation" && (
+          {currentStep === "checkout" && (
             <motion.div
-              key="confirmation"
+              key="checkout"
               className="absolute inset-0 overflow-auto"
               {...dissolve}
             >
-              <TicketmasterConfirmation />
-              <div className="sticky bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-white/0">
-                <button
-                  onClick={handleContinueFromConfirmation}
-                  className="w-full py-3 rounded-[4px] text-white font-semibold text-[16px] tracking-[0.32px]"
-                  style={{
-                    backgroundColor: TM_BLUE,
-                    fontFamily: "'Averta:Semibold', sans-serif",
-                  }}
-                >
-                  Continue
-                </button>
-              </div>
+              <CheckoutView onPlaceOrder={handlePlaceOrder} />
             </motion.div>
           )}
 
@@ -181,6 +171,11 @@ export default function TicketmasterDemo() {
                 onCheckout={handleCheckout}
                 onDecline={handleDecline}
               />
+              <PaymentSheet
+                isOpen={showBottomSheet}
+                onClose={() => setShowBottomSheet(false)}
+                onConfirm={handleConfirmOrder}
+              />
             </motion.div>
           )}
 
@@ -190,37 +185,16 @@ export default function TicketmasterDemo() {
             />
           )}
 
-          {currentStep === "finalConfirmation" && (
+          {currentStep === "confirmation" && (
             <motion.div
-              key="finalConfirmation"
+              key="confirmation"
               className="absolute inset-0 overflow-auto"
               {...dissolve}
             >
               <TicketmasterConfirmation />
-              {addedToOrder && (
-                <div className="sticky bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-white/0">
-                  <div
-                    className="w-full py-3 px-4 rounded-[4px] text-center text-white font-semibold text-[14px]"
-                    style={{
-                      backgroundColor: "#01a469",
-                      fontFamily: "'Averta:Semibold', sans-serif",
-                    }}
-                  >
-                    Dagne Dover Micah Crossbody added to your order
-                  </div>
-                </div>
-              )}
             </motion.div>
           )}
         </AnimatePresence>
-
-        {currentStep === "interstitial" && (
-          <PaymentSheet
-            isOpen={showBottomSheet}
-            onClose={() => setShowBottomSheet(false)}
-            onConfirm={handleConfirmOrder}
-          />
-        )}
       </div>
     </div>
   );
