@@ -9,9 +9,35 @@ interface PartnerFrameProps {
   addedToOrder?: boolean;
 }
 
+interface HeaderConfig {
+  logoUrl: string | null;
+  bgColor: string;
+}
+
+function buildStaticHeader(cfg: HeaderConfig): string {
+  const logo = cfg.logoUrl
+    ? `<img src="${cfg.logoUrl}" alt="Partner" style="max-height:28px;width:auto;display:block;" />`
+    : "";
+
+  return `
+    <div id="rokt-static-header" style="
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px 16px;
+      background-color:${cfg.bgColor};
+      border-bottom:1px solid rgba(0,0,0,0.08);
+      position:sticky;
+      top:0;
+      z-index:9999;
+    ">${logo}</div>
+  `;
+}
+
 function buildIframeHtml(
   html: string,
-  pageType: "checkout" | "confirmation"
+  pageType: "checkout" | "confirmation",
+  header: HeaderConfig
 ): string {
   const responsiveCSS = `
     <style>
@@ -22,6 +48,7 @@ function buildIframeHtml(
       }
       img { max-width: 100% !important; height: auto !important; }
       * { box-sizing: border-box !important; }
+      #rokt-static-header img { max-width: none !important; height: auto !important; }
     </style>
   `;
 
@@ -96,11 +123,21 @@ function buildIframeHtml(
     </script>
   `;
 
+  const staticHeader = buildStaticHeader(header);
+
   let processed = html;
   if (processed.includes("</head>")) {
     processed = processed.replace("</head>", responsiveCSS + viewportFix + "</head>");
   } else {
     processed = responsiveCSS + viewportFix + processed;
+  }
+
+  if (processed.includes("<body")) {
+    processed = processed.replace(/(<body[^>]*>)/i, "$1" + staticHeader);
+  } else if (processed.includes("</head>")) {
+    processed = processed.replace("</head>", "</head>" + staticHeader);
+  } else {
+    processed = staticHeader + processed;
   }
 
   if (processed.includes("</body>")) {
@@ -154,7 +191,10 @@ export function PartnerFrame({
     }
   }, [pageType, addedToOrder, config]);
 
-  const srcDoc = buildIframeHtml(html, pageType);
+  const srcDoc = buildIframeHtml(html, pageType, {
+    logoUrl: config.partner.logo,
+    bgColor: config.partner.headerBgColor,
+  });
 
   return (
     <iframe

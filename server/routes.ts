@@ -6,6 +6,7 @@ import fs from "fs";
 import { storage } from "./storage";
 import { insertPartnerSchema, updatePartnerSchema, partnerToConfig } from "../shared/schema";
 import { extractStyles } from "./extraction/style-extractor";
+import { cleanHtml } from "./extraction/html-cleaner";
 import { checkFont } from "./extraction/font-checker";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -105,8 +106,9 @@ export function registerRoutes(app: Express): void {
     async (req: Request, res: Response) => {
       try {
         if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-        const html = req.file.buffer.toString("utf-8");
-        const result = await extractStyles(html);
+        const rawHtml = req.file.buffer.toString("utf-8");
+        const result = await extractStyles(rawHtml);
+        const html = cleanHtml(rawHtml);
         res.json({ html, extraction: result });
       } catch (err: unknown) {
         console.error("Failed to process HTML:", err);

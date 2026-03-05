@@ -542,6 +542,45 @@ export default function Setup() {
                 </div>
               </div>
             )}
+
+            <div className="border rounded-lg p-4">
+              <h3 className="text-sm font-semibold mb-3">Demo Page Header</h3>
+              <p className="text-xs text-muted-foreground mb-4">
+                The original site header is stripped from uploaded HTML and replaced with a clean
+                static header using your uploaded partner logo.
+              </p>
+              <div className="grid grid-cols-2 gap-4 max-w-sm">
+                <div className="flex flex-col gap-1.5">
+                  <Label className="text-xs">Header Background</Label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="color"
+                      value={form.headerBgColor}
+                      onChange={(e) => setForm((prev) => ({ ...prev, headerBgColor: e.target.value }))}
+                      className="w-10 h-10 rounded border cursor-pointer shrink-0"
+                    />
+                    <Input
+                      value={form.headerBgColor}
+                      onChange={(e) => setForm((prev) => ({ ...prev, headerBgColor: e.target.value }))}
+                      className="text-xs font-mono"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label className="text-xs">Logo Preview</Label>
+                  <div
+                    className="h-10 rounded border flex items-center justify-center px-3"
+                    style={{ backgroundColor: form.headerBgColor }}
+                  >
+                    {form.logo ? (
+                      <img src={form.logo} alt="Logo" className="max-h-6 w-auto" />
+                    ) : (
+                      <span className="text-[10px] text-muted-foreground">No logo uploaded</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
