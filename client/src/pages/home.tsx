@@ -52,30 +52,60 @@ export default function Home() {
           <div className="flex items-center justify-center py-20">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
-        ) : partners.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
-              <Plus className="w-8 h-8 text-muted-foreground" />
-            </div>
-            <h2 className="text-lg font-semibold mb-1">No partners yet</h2>
-            <p className="text-sm text-muted-foreground mb-4 max-w-sm">
-              Add your first partner by uploading their checkout HTML from a
-              SingleFile capture.
-            </p>
-            <Button onClick={() => navigate("/setup")}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Partner
-            </Button>
-          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Card
+              className="group hover:shadow-md transition-shadow overflow-hidden"
+            >
+              <CardContent className="p-0">
+                <div className="h-2" style={{ backgroundColor: "#024ddf" }} />
+                <div className="p-5">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div
+                      className="w-10 h-10 rounded-lg flex items-center justify-center"
+                      style={{ backgroundColor: "#024ddf" }}
+                    >
+                      <img
+                        src="/images/ticketmaster/ticketmaster.png"
+                        alt="Ticketmaster"
+                        className="h-5 w-auto object-contain brightness-0 invert"
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-sm">Ticketmaster</h3>
+                      <p className="text-xs text-muted-foreground">Dagne Dover</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 mb-4">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                      Figma Export
+                    </span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+                      Static Demo
+                    </span>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      className="flex-1"
+                      style={{ backgroundColor: "#024ddf" }}
+                      onClick={() => navigate("/demo/ticketmaster")}
+                    >
+                      <Play className="w-4 h-4 mr-1" />
+                      Start Demo
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {partners.map((config) => (
               <Card
                 key={config.partner.id}
                 className="group hover:shadow-md transition-shadow overflow-hidden"
               >
                 <CardContent className="p-0">
-                  {/* Color banner */}
                   <div
                     className="h-2"
                     style={{
@@ -84,7 +114,6 @@ export default function Home() {
                   />
 
                   <div className="p-5">
-                    {/* Logo + name */}
                     <div className="flex items-center gap-3 mb-4">
                       {config.partner.logo ? (
                         <img
@@ -114,7 +143,6 @@ export default function Home() {
                       </div>
                     </div>
 
-                    {/* Style swatches */}
                     <div className="flex gap-1.5 mb-4">
                       {[
                         config.partner.primaryColor,
@@ -140,7 +168,6 @@ export default function Home() {
                       </div>
                     </div>
 
-                    {/* Pages indicator */}
                     <div className="flex gap-2 mb-4">
                       <span
                         className={`text-xs px-2 py-0.5 rounded-full ${
@@ -164,7 +191,6 @@ export default function Home() {
                       </span>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex gap-2">
                       <Button
                         className="flex-1"
@@ -221,7 +247,6 @@ export default function Home() {
               </Card>
             ))}
 
-            {/* Add new card */}
             <Card
               className="border-dashed hover:border-primary/50 transition-colors cursor-pointer flex items-center justify-center min-h-[240px]"
               onClick={() => navigate("/setup")}
