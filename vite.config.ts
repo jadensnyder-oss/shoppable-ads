@@ -10,7 +10,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   root: path.resolve(__dirname, "client"),
   server: {
-    allowedHosts: "all",
+    allowedHosts: true,
   },
   resolve: {
     alias: {

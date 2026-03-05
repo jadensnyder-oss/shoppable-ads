@@ -9,7 +9,7 @@ export async function setupVite(app: Express): Promise<ViteDevServer> {
   const vite = await createViteServer({
     configFile: path.resolve(__dirname, "..", "vite.config.ts"),
     root: path.resolve(__dirname, "..", "client"),
-    server: { middlewareMode: true, hmr: true },
+    server: { middlewareMode: true, hmr: true, allowedHosts: true },
     appType: "spa",
   });
 
