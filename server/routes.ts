@@ -11,7 +11,7 @@ import { checkFont } from "./extraction/font-checker";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const htmlUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
+const htmlUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
 
 export const UPLOADS_DIR = path.resolve(__dirname, "..", "uploads", "images");
 export const FONTS_DIR = path.resolve(__dirname, "..", "uploads", "fonts");

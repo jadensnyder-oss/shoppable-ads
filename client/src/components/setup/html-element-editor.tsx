@@ -132,143 +132,181 @@ export function HtmlElementEditor({
     }
   };
 
-  const visualScript = `
-    <script>
-      (function() {
-        var selected = new Set();
-        var hoverEl = null;
+  const selectedEls = useRef<Set<HTMLElement>>(new Set());
+  const hoverElRef = useRef<HTMLElement | null>(null);
 
-        function getClasses(el) {
-          var cn = el.className;
-          if (!cn) return [];
-          if (typeof cn === 'string') return cn.trim().split(/\\s+/).filter(Boolean);
-          if (cn.baseVal != null) return cn.baseVal.trim().split(/\\s+/).filter(Boolean);
-          return [];
+  const getClasses = (el: HTMLElement): string[] => {
+    const cn = el.className;
+    if (!cn) return [];
+    if (typeof cn === "string") return cn.trim().split(/\s+/).filter(Boolean);
+    if ((cn as unknown as SVGAnimatedString).baseVal != null)
+      return (cn as unknown as SVGAnimatedString).baseVal.trim().split(/\s+/).filter(Boolean);
+    return [];
+  };
+
+  const getNthChild = (el: HTMLElement): string => {
+    const parent = el.parentElement;
+    if (!parent) return "";
+    const tag = el.tagName.toLowerCase();
+    const sameTag = Array.from(parent.children).filter(
+      (c) => c.tagName.toLowerCase() === tag
+    );
+    if (sameTag.length <= 1) return "";
+    return `:nth-of-type(${sameTag.indexOf(el) + 1})`;
+  };
+
+  const buildSelector = useCallback(
+    (el: HTMLElement, doc: Document): string => {
+      if (el.id) return "#" + el.id;
+      const tag = el.tagName.toLowerCase();
+      if (tag === "html" || tag === "body") return tag;
+
+      const classes = getClasses(el);
+      if (classes.length > 0) {
+        const sel = tag + "." + classes.slice(0, 3).join(".");
+        try {
+          if (doc.querySelectorAll(sel).length === 1) return sel;
+        } catch {
+          /* ignore */
         }
-
-        function getNthChild(el) {
-          var parent = el.parentElement;
-          if (!parent) return '';
-          var tag = el.tagName.toLowerCase();
-          var siblings = parent.children;
-          var sameTag = [];
-          for (var i = 0; i < siblings.length; i++) {
-            if (siblings[i].tagName.toLowerCase() === tag) sameTag.push(siblings[i]);
-          }
-          if (sameTag.length <= 1) return '';
-          var idx = sameTag.indexOf(el) + 1;
-          return ':nth-of-type(' + idx + ')';
-        }
-
-        function buildSelector(el) {
-          if (el.id) return '#' + el.id;
-
-          var tag = el.tagName.toLowerCase();
-          if (tag === 'html' || tag === 'body') return tag;
-
-          var classes = getClasses(el);
-          if (classes.length > 0) {
-            var cls = classes.slice(0, 3).join('.');
-            var sel = tag + '.' + cls;
-            try { if (document.querySelectorAll(sel).length === 1) return sel; } catch(e) {}
-          }
-
-          var parts = [];
-          var current = el;
-          for (var depth = 0; depth < 4 && current && current !== document.body; depth++) {
-            var cTag = current.tagName.toLowerCase();
-            if (current.id) { parts.unshift('#' + current.id); break; }
-            var cClasses = getClasses(current);
-            var part = cTag;
-            if (cClasses.length > 0) {
-              part += '.' + cClasses.slice(0, 2).join('.');
-            } else {
-              part += getNthChild(current);
-            }
-            parts.unshift(part);
-            current = current.parentElement;
-          }
-
-          return parts.join(' > ');
-        }
-
-        document.addEventListener('mouseover', function(e) {
-          var t = e.target;
-          if (t === document.body || t === document.documentElement) return;
-          if (hoverEl && !selected.has(hoverEl)) {
-            hoverEl.style.outline = '';
-            hoverEl.style.outlineOffset = '';
-          }
-          hoverEl = t;
-          if (!selected.has(hoverEl)) {
-            hoverEl.style.outline = '2px solid #3b82f6';
-            hoverEl.style.outlineOffset = '-2px';
-          }
-        }, true);
-
-        document.addEventListener('mouseout', function(e) {
-          if (e.target && !selected.has(e.target)) {
-            e.target.style.outline = '';
-            e.target.style.outlineOffset = '';
-          }
-        }, true);
-
-        document.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          var el = e.target;
-          if (el === document.body || el === document.documentElement) return;
-
-          if (selected.has(el)) {
-            selected.delete(el);
-            el.style.outline = '2px solid #3b82f6';
-          } else {
-            selected.add(el);
-            el.style.outline = '3px solid #ef4444';
-            el.style.outlineOffset = '-3px';
-          }
-
-          var info = [];
-          selected.forEach(function(s) {
-            var tag = s.tagName.toLowerCase();
-            var text = (s.textContent || '').trim().slice(0, 60);
-            info.push({ selector: buildSelector(s), tag: tag, preview: text });
-          });
-
-          window.parent.postMessage({ type: 'ELEMENT_SELECTION', elements: info }, '*');
-        }, true);
-      })();
-    </script>
-  `;
-
-  const handleVisualMessage = useCallback(
-    (event: MessageEvent) => {
-      if (event.data?.type === "ELEMENT_SELECTION") {
-        const elements = event.data.elements as { selector: string; tag: string; preview: string }[];
-        setSelectedSelectors(new Set(elements.map((e) => e.selector)));
-        setSections((prev) => {
-          const existing = new Set(prev.map((s) => s.selector));
-          const additions = elements
-            .filter((e) => !existing.has(e.selector))
-            .map((e) => ({
-              selector: e.selector,
-              tag: e.tag,
-              preview: e.preview || "(empty)",
-              category: "other" as const,
-            }));
-          return [...prev, ...additions];
-        });
       }
+
+      const parts: string[] = [];
+      let current: HTMLElement | null = el;
+      for (let depth = 0; depth < 4 && current && current !== doc.body; depth++) {
+        const cTag = current.tagName.toLowerCase();
+        if (current.id) {
+          parts.unshift("#" + current.id);
+          break;
+        }
+        const cClasses = getClasses(current);
+        let part = cTag;
+        if (cClasses.length > 0) {
+          part += "." + cClasses.slice(0, 2).join(".");
+        } else {
+          part += getNthChild(current);
+        }
+        parts.unshift(part);
+        current = current.parentElement;
+      }
+      return parts.join(" > ");
     },
     []
   );
 
-  useEffect(() => {
-    window.addEventListener("message", handleVisualMessage);
-    return () => window.removeEventListener("message", handleVisualMessage);
-  }, [handleVisualMessage]);
+  const listenersRef = useRef<{
+    doc: Document;
+    mouseover: (e: Event) => void;
+    mouseout: (e: Event) => void;
+    click: (e: Event) => void;
+  } | null>(null);
 
-  const iframeSrcDoc = html + visualScript;
+  const attachVisualListeners = useCallback(() => {
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+    const doc = iframe.contentDocument;
+    if (!doc?.body) return;
+
+    if (listenersRef.current) {
+      const prev = listenersRef.current;
+      prev.doc.removeEventListener("mouseover", prev.mouseover, true);
+      prev.doc.removeEventListener("mouseout", prev.mouseout, true);
+      prev.doc.removeEventListener("click", prev.click, true);
+      listenersRef.current = null;
+    }
+
+    selectedEls.current.clear();
+
+    const onMouseOver = (e: Event) => {
+      const t = e.target as HTMLElement;
+      if (!t || t === doc.body || t === doc.documentElement) return;
+      if (hoverElRef.current && !selectedEls.current.has(hoverElRef.current)) {
+        hoverElRef.current.style.outline = "";
+        hoverElRef.current.style.outlineOffset = "";
+      }
+      hoverElRef.current = t;
+      if (!selectedEls.current.has(t)) {
+        t.style.outline = "2px solid #3b82f6";
+        t.style.outlineOffset = "-2px";
+      }
+    };
+
+    const onMouseOut = (e: Event) => {
+      const t = e.target as HTMLElement;
+      if (t && !selectedEls.current.has(t)) {
+        t.style.outline = "";
+        t.style.outlineOffset = "";
+      }
+    };
+
+    const onClick = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const el = e.target as HTMLElement;
+      if (!el || el === doc.body || el === doc.documentElement) return;
+
+      if (selectedEls.current.has(el)) {
+        selectedEls.current.delete(el);
+        el.style.outline = "2px solid #3b82f6";
+      } else {
+        selectedEls.current.add(el);
+        el.style.outline = "3px solid #ef4444";
+        el.style.outlineOffset = "-3px";
+      }
+
+      const info: { selector: string; tag: string; preview: string }[] = [];
+      selectedEls.current.forEach((s) => {
+        info.push({
+          selector: buildSelector(s, doc),
+          tag: s.tagName.toLowerCase(),
+          preview: (s.textContent || "").trim().slice(0, 60),
+        });
+      });
+
+      setSelectedSelectors(new Set(info.map((i) => i.selector)));
+      setSections((prev) => {
+        const existing = new Set(prev.map((s) => s.selector));
+        const additions = info
+          .filter((i) => !existing.has(i.selector))
+          .map((i) => ({
+            selector: i.selector,
+            tag: i.tag,
+            preview: i.preview || "(empty)",
+            category: "other" as const,
+          }));
+        return [...prev, ...additions];
+      });
+    };
+
+    doc.addEventListener("mouseover", onMouseOver, true);
+    doc.addEventListener("mouseout", onMouseOut, true);
+    doc.addEventListener("click", onClick, true);
+
+    listenersRef.current = { doc, mouseover: onMouseOver, mouseout: onMouseOut, click: onClick };
+
+    selectedSelectors.forEach((sel) => {
+      try {
+        const el = doc.querySelector(sel) as HTMLElement | null;
+        if (el) {
+          selectedEls.current.add(el);
+          el.style.outline = "3px solid #ef4444";
+          el.style.outlineOffset = "-3px";
+        }
+      } catch { /* invalid selector */ }
+    });
+  }, [buildSelector, selectedSelectors]);
+
+  useEffect(() => {
+    return () => {
+      if (listenersRef.current) {
+        const prev = listenersRef.current;
+        prev.doc.removeEventListener("mouseover", prev.mouseover, true);
+        prev.doc.removeEventListener("mouseout", prev.mouseout, true);
+        prev.doc.removeEventListener("click", prev.click, true);
+        listenersRef.current = null;
+      }
+    };
+  }, []);
 
   if (!html) return null;
 
@@ -403,10 +441,10 @@ export function HtmlElementEditor({
           <div className="relative" style={{ height: "400px" }}>
             <iframe
               ref={iframeRef}
-              srcDoc={iframeSrcDoc}
+              srcDoc={html}
               className="w-full h-full border-0"
-              sandbox="allow-scripts"
               title="HTML Element Editor"
+              onLoad={attachVisualListeners}
             />
           </div>
           {selectedSelectors.size > 0 && (
