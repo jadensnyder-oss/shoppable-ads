@@ -138,10 +138,12 @@ export function HtmlElementEditor({
   const getClasses = (el: HTMLElement): string[] => {
     const cn = el.className;
     if (!cn) return [];
-    if (typeof cn === "string") return cn.trim().split(/\s+/).filter(Boolean);
-    if ((cn as unknown as SVGAnimatedString).baseVal != null)
-      return (cn as unknown as SVGAnimatedString).baseVal.trim().split(/\s+/).filter(Boolean);
-    return [];
+    let raw: string[];
+    if (typeof cn === "string") raw = cn.trim().split(/\s+/).filter(Boolean);
+    else if ((cn as unknown as SVGAnimatedString).baseVal != null)
+      raw = (cn as unknown as SVGAnimatedString).baseVal.trim().split(/\s+/).filter(Boolean);
+    else return [];
+    return raw.filter((c) => !/[:[\]()!@#%^&*+=|~`{}/<>]/.test(c));
   };
 
   const getNthChild = (el: HTMLElement): string => {

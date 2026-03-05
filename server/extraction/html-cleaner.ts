@@ -203,7 +203,11 @@ export function analyzeHtml(html: string): DetectedSection[] {
 export function removeSelectors(html: string, selectors: string[]): string {
   const $ = cheerio.load(html);
   for (const sel of selectors) {
-    $(sel).remove();
+    try {
+      $(sel).remove();
+    } catch (err) {
+      console.warn(`Skipping invalid selector "${sel}":`, (err as Error).message);
+    }
   }
   return $.html();
 }
