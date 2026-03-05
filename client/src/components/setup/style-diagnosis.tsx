@@ -1,10 +1,50 @@
 import { useState, useEffect, useCallback } from "react";
-import { AlertTriangle, Check, Info, X } from "lucide-react";
+import { AlertTriangle, Check, Info, X, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FontPicker } from "@/components/setup/font-picker";
 import { isFontAvailable } from "@shared/fonts";
 import type { ExtractedStyles, ExtractionFlag } from "@shared/schema";
+
+function parsePx(value: string): number {
+  const num = parseFloat(value.replace(/[^0-9.]/g, ""));
+  return isNaN(num) ? 8 : Math.round(num);
+}
+
+function RadiusStepper({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const px = parsePx(value);
+  const setPx = (n: number) => onChange(`${Math.max(0, Math.min(100, n))}px`);
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        onClick={() => setPx(px - 1)}
+        disabled={px <= 0}
+        className="w-8 h-8 rounded-md border border-input bg-background flex items-center justify-center hover:bg-accent disabled:opacity-40 cursor-pointer transition-colors"
+      >
+        <Minus className="w-3.5 h-3.5" />
+      </button>
+      <input
+        type="number"
+        min={0}
+        max={100}
+        value={px}
+        onChange={(e) => setPx(parseInt(e.target.value, 10) || 0)}
+        className="w-16 h-8 text-center text-sm font-medium rounded-md border border-input bg-background [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+      />
+      <span className="text-sm text-muted-foreground">px</span>
+      <button
+        type="button"
+        onClick={() => setPx(px + 1)}
+        disabled={px >= 100}
+        className="w-8 h-8 rounded-md border border-input bg-background flex items-center justify-center hover:bg-accent disabled:opacity-40 cursor-pointer transition-colors"
+      >
+        <Plus className="w-3.5 h-3.5" />
+      </button>
+    </div>
+  );
+}
 
 interface StyleDiagnosisProps {
   styles: ExtractedStyles;
@@ -380,18 +420,17 @@ export function StyleDiagnosis({
       {styles.borderRadius && (
         <div className="flex flex-col gap-2">
           <h3 className="text-sm font-semibold">Border Radius</h3>
-          <div className="p-3 bg-muted/30 rounded-lg flex items-center gap-3">
+          <div className="p-3 bg-muted/30 rounded-lg flex items-center gap-4">
             <div
-              className="w-12 h-12 bg-primary/10 border-2 border-primary/30"
+              className="w-12 h-12 bg-primary/10 border-2 border-primary/30 shrink-0"
               style={{
                 borderRadius:
-                  overrides.borderRadius || styles.borderRadius.value,
+                  overrides.borderRadius || `${parsePx(styles.borderRadius.value)}px`,
               }}
             />
-            <Input
+            <RadiusStepper
               value={overrides.borderRadius || styles.borderRadius.value}
-              onChange={(e) => update("borderRadius", e.target.value)}
-              className="text-sm max-w-[120px]"
+              onChange={(v) => update("borderRadius", v)}
             />
           </div>
         </div>

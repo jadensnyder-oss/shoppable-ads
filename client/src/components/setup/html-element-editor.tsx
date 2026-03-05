@@ -138,13 +138,68 @@ export function HtmlElementEditor({
         var selected = new Set();
         var hoverEl = null;
 
+        function getClasses(el) {
+          var cn = el.className;
+          if (!cn) return [];
+          if (typeof cn === 'string') return cn.trim().split(/\\s+/).filter(Boolean);
+          if (cn.baseVal != null) return cn.baseVal.trim().split(/\\s+/).filter(Boolean);
+          return [];
+        }
+
+        function getNthChild(el) {
+          var parent = el.parentElement;
+          if (!parent) return '';
+          var tag = el.tagName.toLowerCase();
+          var siblings = parent.children;
+          var sameTag = [];
+          for (var i = 0; i < siblings.length; i++) {
+            if (siblings[i].tagName.toLowerCase() === tag) sameTag.push(siblings[i]);
+          }
+          if (sameTag.length <= 1) return '';
+          var idx = sameTag.indexOf(el) + 1;
+          return ':nth-of-type(' + idx + ')';
+        }
+
+        function buildSelector(el) {
+          if (el.id) return '#' + el.id;
+
+          var tag = el.tagName.toLowerCase();
+          if (tag === 'html' || tag === 'body') return tag;
+
+          var classes = getClasses(el);
+          if (classes.length > 0) {
+            var cls = classes.slice(0, 3).join('.');
+            var sel = tag + '.' + cls;
+            try { if (document.querySelectorAll(sel).length === 1) return sel; } catch(e) {}
+          }
+
+          var parts = [];
+          var current = el;
+          for (var depth = 0; depth < 4 && current && current !== document.body; depth++) {
+            var cTag = current.tagName.toLowerCase();
+            if (current.id) { parts.unshift('#' + current.id); break; }
+            var cClasses = getClasses(current);
+            var part = cTag;
+            if (cClasses.length > 0) {
+              part += '.' + cClasses.slice(0, 2).join('.');
+            } else {
+              part += getNthChild(current);
+            }
+            parts.unshift(part);
+            current = current.parentElement;
+          }
+
+          return parts.join(' > ');
+        }
+
         document.addEventListener('mouseover', function(e) {
-          if (e.target === document.body || e.target === document.documentElement) return;
+          var t = e.target;
+          if (t === document.body || t === document.documentElement) return;
           if (hoverEl && !selected.has(hoverEl)) {
             hoverEl.style.outline = '';
             hoverEl.style.outlineOffset = '';
           }
-          hoverEl = e.target;
+          hoverEl = t;
           if (!selected.has(hoverEl)) {
             hoverEl.style.outline = '2px solid #3b82f6';
             hoverEl.style.outlineOffset = '-2px';
@@ -175,12 +230,9 @@ export function HtmlElementEditor({
 
           var info = [];
           selected.forEach(function(s) {
-            var id = s.id ? '#' + s.id : '';
-            var cls = s.className && typeof s.className === 'string' ?
-              '.' + s.className.trim().split(/\\s+/).slice(0, 2).join('.') : '';
             var tag = s.tagName.toLowerCase();
             var text = (s.textContent || '').trim().slice(0, 60);
-            info.push({ selector: id || (tag + cls) || tag, tag: tag, preview: text });
+            info.push({ selector: buildSelector(s), tag: tag, preview: text });
           });
 
           window.parent.postMessage({ type: 'ELEMENT_SELECTION', elements: info }, '*');
