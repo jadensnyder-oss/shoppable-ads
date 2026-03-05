@@ -1,12 +1,13 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useParams } from "wouter";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { HtmlUpload } from "@/components/setup/html-upload";
+import { AssetUpload } from "@/components/setup/asset-upload";
 import { StyleDiagnosis } from "@/components/setup/style-diagnosis";
 import { ContentEntry } from "@/components/setup/content-entry";
 import { PlacementPreview } from "@/components/setup/placement-preview";
@@ -255,6 +256,31 @@ export default function Setup() {
     onError: (err) => toast.error(err.message || "Save failed"),
   });
 
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLogoUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await fetch("/api/partners/upload-image", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json();
+      setForm((prev) => ({ ...prev, logo: data.url }));
+      toast.success("Logo uploaded");
+    } catch {
+      toast.error("Logo upload failed");
+    } finally {
+      setLogoUploading(false);
+    }
+  };
+
   const stepIndex = STEPS.indexOf(step);
   const progress = ((stepIndex + 1) / STEPS.length) * 100;
 
@@ -362,37 +388,87 @@ export default function Setup() {
               </p>
             </div>
 
-            {!isEditing && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <Label>Partner Name</Label>
-                  <Input
-                    value={form.name}
-                    onChange={(e) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        name: e.target.value,
-                        partnerId: prev.partnerId || e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
-                      }))
-                    }
-                    placeholder="e.g. Ticketmaster"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <Label>Partner ID (slug)</Label>
-                  <Input
-                    value={form.partnerId}
-                    onChange={(e) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        partnerId: e.target.value,
-                      }))
-                    }
-                    placeholder="e.g. ticketmaster"
-                  />
-                </div>
+            {/* Partner info + Logo */}
+            <div className="flex gap-6 items-start">
+              <div className="flex flex-col items-center gap-2">
+                <Label className="text-xs">Logo</Label>
+                {form.logo ? (
+                  <div className="relative w-20 h-20 rounded-lg border overflow-hidden bg-white flex items-center justify-center">
+                    <img
+                      src={form.logo}
+                      alt="Partner logo"
+                      className="max-w-full max-h-full object-contain p-1"
+                    />
+                    <button
+                      onClick={() => setForm((prev) => ({ ...prev, logo: "" }))}
+                      className="absolute top-1 right-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center cursor-pointer"
+                    >
+                      <X className="w-3 h-3 text-white" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => logoInputRef.current?.click()}
+                    disabled={logoUploading}
+                    className="w-20 h-20 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-muted-foreground hover:border-primary/50 transition-colors cursor-pointer"
+                  >
+                    {logoUploading ? (
+                      <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <Upload className="w-5 h-5" />
+                        <span className="text-[10px] mt-1">Upload</span>
+                      </>
+                    )}
+                  </button>
+                )}
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleLogoUpload}
+                />
               </div>
-            )}
+
+              {!isEditing ? (
+                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <Label>Partner Name</Label>
+                    <Input
+                      value={form.name}
+                      onChange={(e) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                          partnerId: prev.partnerId || e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
+                        }))
+                      }
+                      placeholder="e.g. Ticketmaster"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <Label>Partner ID (slug)</Label>
+                    <Input
+                      value={form.partnerId}
+                      onChange={(e) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          partnerId: e.target.value,
+                        }))
+                      }
+                      placeholder="e.g. ticketmaster"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex-1 flex items-center">
+                  <p className="text-sm text-muted-foreground">
+                    Editing <strong>{form.name}</strong>
+                  </p>
+                </div>
+              )}
+            </div>
 
             <HtmlUpload
               label="Checkout Page"
@@ -407,6 +483,8 @@ export default function Setup() {
               onUpload={handleConfirmationUpload}
               currentHtml={form.confirmationHtml || null}
             />
+
+            <AssetUpload />
           </div>
         )}
 
