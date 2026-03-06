@@ -365,7 +365,7 @@ export function ProductBlock({
         </p>
         <button
           onClick={onAddToOrder}
-          className="h-[42px] rounded-[100px] w-full flex items-center justify-center cursor-pointer transition-opacity hover:opacity-90 active:scale-[0.98]"
+          className="h-[42px] w-full flex items-center justify-center cursor-pointer transition-opacity hover:opacity-90 active:scale-[0.98]"
           style={{
             backgroundColor: partner.buttonBgColor || "#1a1a1a",
             border: partner.buttonBorder || "none",
@@ -389,7 +389,7 @@ export function ProductBlock({
 
         <button
           onClick={onDecline}
-          className="h-[42px] rounded-[100px] w-full flex items-center justify-center cursor-pointer transition-opacity hover:opacity-90 active:scale-[0.98]"
+          className="h-[42px] w-full flex items-center justify-center cursor-pointer transition-opacity hover:opacity-90 active:scale-[0.98]"
           style={{
             backgroundColor: "transparent",
             border: "1px solid #0f0f0f",
