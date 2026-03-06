@@ -34,12 +34,12 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div>
             <img
-              src="/images/rokt-logo.png"
+              src="/images/rokt-logo.svg"
               alt="Rokt"
               className="h-7 w-auto object-contain"
             />
             <p className="text-sm text-muted-foreground mt-0.5">
-              Shoppable Ads demo platform
+              Client Demo Platform
             </p>
           </div>
           <Button onClick={() => navigate("/setup")}>
