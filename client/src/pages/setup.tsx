@@ -728,8 +728,8 @@ export default function Setup() {
 
         {step === "save" && (
           <div className="flex flex-col gap-6 items-center py-8">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-              <Check className="w-8 h-8 text-green-600" />
+            <div className="w-16 h-16 bg-[#C2007510] rounded-full flex items-center justify-center">
+              <Check className="w-8 h-8 text-primary" />
             </div>
             <h2 className="text-lg font-semibold">Ready to Save</h2>
             <p className="text-sm text-muted-foreground text-center max-w-md">

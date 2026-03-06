@@ -208,7 +208,7 @@ export default function Home() {
 
                     <div className="flex gap-2">
                       <Button
-                        className="flex-1"
+                        className="flex-1 bg-[#1a1a1a] hover:bg-[#333] text-white"
                         onClick={() =>
                           navigate(
                             `/demo?partner=${config.partner.id}`
