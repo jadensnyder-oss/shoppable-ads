@@ -33,11 +33,13 @@ export default function Home() {
       <header className="border-b bg-white">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold tracking-tight">
-              Rokt Shoppable Ads
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Sales demo platform
+            <img
+              src="/images/rokt-logo.png"
+              alt="Rokt"
+              className="h-7 w-auto object-contain"
+            />
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Shoppable Ads demo platform
             </p>
           </div>
           <Button onClick={() => navigate("/setup")}>
