@@ -19,7 +19,7 @@ export function PostConfirmationScreen({
   advertiserName,
   addedToOrder = false,
   loadingDuration = 3000,
-  countdownFrom = 3,
+  countdownFrom = 4,
   customSpinner,
   onComplete,
 }: PostConfirmationScreenProps) {

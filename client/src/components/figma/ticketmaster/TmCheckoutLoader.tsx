@@ -63,7 +63,7 @@ function TicketCheckIcon() {
 export default function TmCheckoutLoader({
   onComplete,
   spinnerDuration = 2500,
-  successDuration = 2000,
+  successDuration = 2500,
 }: TmCheckoutLoaderProps) {
   const [phase, setPhase] = useState<"spinner" | "success">("spinner");
 
