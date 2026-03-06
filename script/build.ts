@@ -23,7 +23,7 @@ async function buildAll() {
     platform: "node",
     format: "cjs",
     bundle: true,
-    external: [],
+    external: ["lightningcss", "esbuild", "vite", "tsx"],
     target: "node20",
     sourcemap: true,
   });
