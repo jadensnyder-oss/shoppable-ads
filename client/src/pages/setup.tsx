@@ -5,7 +5,6 @@ import { ArrowLeft, ArrowRight, Check, Upload, X, Type } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import { HtmlUpload } from "@/components/setup/html-upload";
 import { AssetUpload } from "@/components/setup/asset-upload";
 import { StyleDiagnosis } from "@/components/setup/style-diagnosis";
@@ -289,7 +288,6 @@ export default function Setup() {
   };
 
   const stepIndex = STEPS.indexOf(step);
-  const progress = ((stepIndex + 1) / STEPS.length) * 100;
 
   const previewConfig = useMemo(() => formToConfig(form), [form]);
 
@@ -359,28 +357,35 @@ export default function Setup() {
             </h2>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-muted-foreground" role="tablist" aria-label="Setup steps">
+          <div className="flex items-center" role="tablist" aria-label="Setup steps">
             {STEPS.map((s, i) => (
-              <button
-                key={s}
-                role="tab"
-                aria-selected={s === step}
-                aria-label={`Step ${i + 1}: ${STEP_LABELS[s]}`}
-                onClick={() => setStep(s)}
-                className={`cursor-pointer transition-colors ${
-                  s === step
-                    ? "text-foreground font-medium"
-                    : i < stepIndex
-                      ? "text-primary"
-                      : ""
-                }`}
-              >
-                {i > 0 && <span className="mx-1.5">→</span>}
-                {STEP_LABELS[s]}
-              </button>
+              <div key={s} className="flex items-center flex-1 last:flex-none">
+                <button
+                  role="tab"
+                  aria-selected={s === step}
+                  aria-label={`Step ${i + 1}: ${STEP_LABELS[s]}`}
+                  onClick={() => setStep(s)}
+                  className={`cursor-pointer transition-colors text-xs whitespace-nowrap ${
+                    s === step
+                      ? "text-foreground font-medium"
+                      : i < stepIndex
+                        ? "text-primary"
+                        : "text-muted-foreground"
+                  }`}
+                >
+                  {STEP_LABELS[s]}
+                </button>
+                {i < STEPS.length - 1 && (
+                  <div className="flex-1 mx-3 h-0.5 rounded-full bg-muted overflow-hidden">
+                    <div
+                      className="h-full bg-primary rounded-full transition-all duration-300"
+                      style={{ width: i < stepIndex ? "100%" : "0%" }}
+                    />
+                  </div>
+                )}
+              </div>
             ))}
           </div>
-          <Progress value={progress} className="mt-2 h-1" />
         </div>
       </header>
 
