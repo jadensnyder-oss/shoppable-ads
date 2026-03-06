@@ -62,13 +62,13 @@ export default function Home() {
                 <div className="p-5">
                   <div className="flex items-center gap-3 mb-4">
                     <div
-                      className="w-10 h-10 rounded-lg flex items-center justify-center"
+                      className="w-10 h-10 rounded-lg flex items-center justify-center p-1.5"
                       style={{ backgroundColor: "#024ddf" }}
                     >
                       <img
                         src="/images/ticketmaster/ticketmaster.png"
                         alt="Ticketmaster"
-                        className="h-5 w-auto object-contain brightness-0 invert"
+                        className="w-full h-full object-contain brightness-0 invert"
                       />
                     </div>
                     <div>
@@ -113,17 +113,30 @@ export default function Home() {
                     }}
                   />
 
-                  <div className="p-5">
+                  <div className="p-5 relative">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute top-3 right-3 h-8 w-8 text-muted-foreground hover:text-foreground"
+                      onClick={() =>
+                        navigate(`/setup/${config.partner.id}`)
+                      }
+                    >
+                      <Settings className="w-4 h-4" />
+                    </Button>
+
                     <div className="flex items-center gap-3 mb-4">
                       {config.partner.logo ? (
-                        <img
-                          src={config.partner.logo}
-                          alt={config.partner.name}
-                          className="h-8 w-auto object-contain"
-                        />
+                        <div className="w-10 h-10 rounded-lg border overflow-hidden flex items-center justify-center p-1.5 shrink-0">
+                          <img
+                            src={config.partner.logo}
+                            alt={config.partner.name}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
                       ) : (
                         <div
-                          className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-lg"
+                          className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-lg shrink-0"
                           style={{
                             backgroundColor: config.partner.primaryColor,
                           }}
@@ -202,15 +215,6 @@ export default function Home() {
                       >
                         <Play className="w-4 h-4 mr-1" />
                         Start Demo
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() =>
-                          navigate(`/setup/${config.partner.id}`)
-                        }
-                      >
-                        <Settings className="w-4 h-4" />
                       </Button>
                       {confirmDelete === config.partner.id ? (
                         <div className="flex gap-1">
