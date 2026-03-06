@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { Clock, ChevronLeft, ChevronRight, Truck } from "lucide-react";
 import type { PartnerConfig } from "@shared/schema";
 
 const DESIGN_WIDTH = 393;
@@ -32,9 +33,10 @@ function Countdown({
   const display = `${mins}:${secs.toString().padStart(2, "0")}`;
 
   return (
-    <div className="bg-[#fafafa] flex gap-[16px] items-start justify-center px-[16px] py-[14px] relative rounded-[8px] w-full">
+    <div className="bg-[#fafafa] flex gap-[12px] items-center px-[16px] py-[14px] relative rounded-[8px] w-full">
       <div className="absolute border border-[#cacaca] border-solid inset-[-0.5px] pointer-events-none rounded-[8.5px]" />
-      <div className="flex flex-1 gap-[4px] items-center justify-center text-center">
+      <Clock className="w-5 h-5 shrink-0" style={{ color: primaryColor }} />
+      <div className="flex-1 text-center">
         <p style={{ fontSize: scale(16), color: primaryColor }}>
           <span
             style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, lineHeight: 1.2 }}
@@ -70,10 +72,12 @@ function ImageCarousel({ images }: { images: string[] }) {
     setCurrent((prev) => Math.min(prev, Math.max(0, displayImages.length - 1)));
   }, [displayImages.length]);
 
+  const prev = useCallback(() => {
+    setCurrent((c) => Math.max(0, c - 1));
+  }, []);
+
   const next = useCallback(() => {
-    if (displayImages.length > 1) {
-      setCurrent((prev) => (prev + 1) % displayImages.length);
-    }
+    setCurrent((c) => Math.min(displayImages.length - 1, c + 1));
   }, [displayImages.length]);
 
   if (displayImages.length === 0) {
@@ -83,32 +87,27 @@ function ImageCarousel({ images }: { images: string[] }) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-[16px]">
-      <div
-        className="w-full aspect-square rounded-[16px] overflow-hidden relative cursor-pointer"
-        onClick={next}
-      >
-        <img
-          src={displayImages[current]}
-          alt="Product"
-          className="w-full h-full object-cover"
-        />
-      </div>
-      {displayImages.length > 1 && (
-        <div className="flex gap-[7px] items-center">
-          {displayImages.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className="rounded-full transition-all"
-              style={{
-                width: i === current ? 8 : i === displayImages.length - 1 ? 5 : 8,
-                height: i === current ? 8 : i === displayImages.length - 1 ? 5 : 8,
-                backgroundColor: i === current ? "#303030" : "#CACACA",
-              }}
-            />
-          ))}
-        </div>
+    <div className="w-full aspect-square rounded-[16px] overflow-hidden relative">
+      <img
+        src={displayImages[current]}
+        alt="Product"
+        className="w-full h-full object-cover"
+      />
+      {current > 0 && (
+        <button
+          onClick={prev}
+          className="absolute left-[8px] top-1/2 -translate-y-1/2 w-[32px] h-[32px] rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center cursor-pointer transition-colors"
+        >
+          <ChevronLeft className="w-5 h-5 text-white" />
+        </button>
+      )}
+      {current < displayImages.length - 1 && (
+        <button
+          onClick={next}
+          className="absolute right-[8px] top-1/2 -translate-y-1/2 w-[32px] h-[32px] rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center cursor-pointer transition-colors"
+        >
+          <ChevronRight className="w-5 h-5 text-white" />
+        </button>
       )}
     </div>
   );
@@ -299,7 +298,7 @@ export function ProductBlock({
                         {variant.options[0]}
                       </span>
                     </div>
-                    <svg width="20" height="20" viewBox="0 0 12 7" fill="none">
+                    <svg width="16" height="16" viewBox="0 0 12 7" fill="none">
                       <path d="M0.833 0.833L5.833 5.833L10.833 0.833" stroke="black" strokeWidth="1.667" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
@@ -312,8 +311,9 @@ export function ProductBlock({
           {advertiser.soldBy && (
             <div className="flex flex-col gap-[16px] items-start w-full">
               <div className="w-full h-0 border-t border-[#eaecf0]" />
-              <div className="flex items-center w-full">
-                <div className="flex flex-col gap-[3.75px] w-full">
+              <div className="flex items-start gap-[10px] w-full">
+                <Truck className="w-5 h-5 shrink-0 mt-[2px]" style={{ color: "#242424" }} />
+                <div className="flex flex-col gap-[3.75px] flex-1">
                   <p className="leading-[1.37] tracking-[0.064px]"
                     style={{ fontSize: scale(14), fontFamily: "'Inter', sans-serif", fontWeight: 500, color: "#242424" }}>
                     Billing &amp; Shipping Details
@@ -333,6 +333,11 @@ export function ProductBlock({
           )}
         </div>
       </div>
+
+      <p className="text-center w-full"
+        style={{ fontSize: scale(12), fontFamily: "'Inter', sans-serif", color: "#5f5f5f" }}>
+        Don&apos;t worry, your card won&apos;t be charged yet.
+      </p>
 
       {/* CTA Buttons */}
       <div className="flex flex-col gap-[8px] items-start w-full">
