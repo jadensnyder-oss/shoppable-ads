@@ -1,10 +1,27 @@
 import { build } from "vite";
-import { build as esbuild } from "esbuild";
+import { build as esbuild, type Plugin } from "esbuild";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
+
+const fixImportMeta: Plugin = {
+  name: "fix-import-meta",
+  setup(build) {
+    build.onLoad({ filter: /\.ts$/ }, async (args) => {
+      let contents = await fs.promises.readFile(args.path, "utf8");
+      if (contents.includes("import.meta.url")) {
+        contents = contents.replace(
+          /const __dirname = path\.dirname\(fileURLToPath\(import\.meta\.url\)\);?/g,
+          "/* __dirname provided by CJS runtime */"
+        );
+      }
+      return { contents, loader: "ts" };
+    });
+  },
+};
 
 async function buildAll() {
   console.log("Building client...");
@@ -26,12 +43,7 @@ async function buildAll() {
     external: ["lightningcss", "esbuild", "vite", "tsx"],
     target: "node20",
     sourcemap: true,
-    banner: {
-      js: 'const _importMetaUrl = require("url").pathToFileURL(__filename).href;',
-    },
-    define: {
-      "import.meta.url": "_importMetaUrl",
-    },
+    plugins: [fixImportMeta],
   });
 
   console.log("Build complete!");
