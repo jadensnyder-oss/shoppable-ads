@@ -391,8 +391,8 @@ export function ProductBlock({
           onClick={onDecline}
           className="h-[42px] w-full flex items-center justify-center cursor-pointer transition-opacity hover:opacity-90 active:scale-[0.98]"
           style={{
-            backgroundColor: "transparent",
-            border: "1px solid #0f0f0f",
+            backgroundColor: partner.secondaryButtonBgColor || "transparent",
+            border: partner.secondaryButtonBorder || "1px solid #0f0f0f",
             borderRadius: partner.buttonBorderRadius || "100px",
           }}
         >
@@ -401,7 +401,7 @@ export function ProductBlock({
             style={{
               fontSize: scale(16),
               fontFamily: "'Inter', sans-serif",
-              color: "#000000",
+              color: partner.secondaryButtonTextColor || "#000000",
             }}
           >
             Decline offer

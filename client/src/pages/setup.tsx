@@ -48,6 +48,9 @@ interface FormState {
   buttonTextColor: string;
   buttonBorderRadius: string;
   buttonBorder: string;
+  secondaryButtonBgColor: string;
+  secondaryButtonTextColor: string;
+  secondaryButtonBorder: string;
   headerBgColor: string;
   headerBgImage: string;
   confirmationText: string;
@@ -85,6 +88,9 @@ const defaultForm: FormState = {
   buttonTextColor: "#ffffff",
   buttonBorderRadius: "100px",
   buttonBorder: "none",
+  secondaryButtonBgColor: "transparent",
+  secondaryButtonTextColor: "#000000",
+  secondaryButtonBorder: "1px solid #0f0f0f",
   headerBgColor: "#ffffff",
   headerBgImage: "",
   confirmationText: "Your order was placed!",
@@ -122,6 +128,10 @@ function formToConfig(form: FormState): PartnerConfig {
       buttonTextColor: form.buttonTextColor,
       buttonBorderRadius: form.buttonBorderRadius,
       buttonBorder: form.buttonBorder,
+      secondaryButtonBgColor: form.secondaryButtonBgColor,
+      secondaryButtonTextColor: form.secondaryButtonTextColor,
+      secondaryButtonBorder: form.secondaryButtonBorder,
+      logoColor: form.logoColor || null,
       headerBgColor: form.headerBgColor,
       headerBgImage: form.headerBgImage || null,
       checkoutHtml: form.checkoutHtml || null,
@@ -146,6 +156,32 @@ function formToConfig(form: FormState): PartnerConfig {
       soldBy: form.soldBy || null,
     },
   };
+}
+
+function HexColorInput({
+  value,
+  onChange,
+  className,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  className?: string;
+}) {
+  const [raw, setRaw] = useState(value);
+  useEffect(() => { setRaw(value); }, [value]);
+  return (
+    <Input
+      value={raw.toUpperCase()}
+      onChange={(e) => {
+        const text = e.target.value;
+        setRaw(text);
+        const v = text.startsWith("#") ? text : `#${text}`;
+        if (/^#[0-9a-fA-F]{6}$/.test(v)) onChange(v);
+      }}
+      onBlur={() => setRaw(value)}
+      className={className}
+    />
+  );
 }
 
 export default function Setup() {
@@ -186,10 +222,14 @@ export default function Setup() {
         buttonTextColor: p.buttonTextColor,
         buttonBorderRadius: p.buttonBorderRadius,
         buttonBorder: p.buttonBorder,
+        secondaryButtonBgColor: p.secondaryButtonBgColor || "transparent",
+        secondaryButtonTextColor: p.secondaryButtonTextColor || "#000000",
+        secondaryButtonBorder: p.secondaryButtonBorder || "1px solid #0f0f0f",
         headerBgColor: p.headerBgColor,
         headerBgImage: p.headerBgImage || "",
         confirmationText: p.confirmationText,
         customFonts: p.customFonts || [],
+        logoColor: p.logoColor || "#1a1a1a",
         advertiserBrand: a.brandName || "",
         productTitle: a.productTitle || "",
         productImage: a.productImage || "",
@@ -224,6 +264,10 @@ export default function Setup() {
         buttonTextColor: data.buttonTextColor,
         buttonBorderRadius: data.buttonBorderRadius,
         buttonBorder: data.buttonBorder,
+        secondaryButtonBgColor: data.secondaryButtonBgColor,
+        secondaryButtonTextColor: data.secondaryButtonTextColor,
+        secondaryButtonBorder: data.secondaryButtonBorder,
+        logoColor: data.logoColor || null,
         headerBgColor: data.headerBgColor,
         headerBgImage: data.headerBgImage || null,
         checkoutHtml: data.checkoutHtml || null,
@@ -343,6 +387,9 @@ export default function Setup() {
       buttonTextColor: overrides.buttonTextColor || s.buttonStyles?.textColor || prev.buttonTextColor,
       buttonBorderRadius: overrides.buttonBorderRadius || s.buttonStyles?.borderRadius || prev.buttonBorderRadius,
       buttonBorder: s.buttonStyles?.border || prev.buttonBorder,
+      secondaryButtonBgColor: overrides.secondaryButtonBgColor || prev.secondaryButtonBgColor,
+      secondaryButtonTextColor: overrides.secondaryButtonTextColor || prev.secondaryButtonTextColor,
+      secondaryButtonBorder: overrides.secondaryButtonBorder || prev.secondaryButtonBorder,
     }));
     setStep("content");
   };
@@ -474,12 +521,9 @@ export default function Setup() {
                       }
                       className="w-7 h-7 rounded border cursor-pointer shrink-0"
                     />
-                    <Input
-                      value={form.logoColor.toUpperCase()}
-                      onChange={(e) => {
-                        const v = e.target.value.startsWith("#") ? e.target.value : `#${e.target.value}`;
-                        if (/^#[0-9a-fA-F]{6}$/.test(v)) setForm((prev) => ({ ...prev, logoColor: v }));
-                      }}
+                    <HexColorInput
+                      value={form.logoColor}
+                      onChange={(v) => setForm((prev) => ({ ...prev, logoColor: v }))}
                       className="w-24 h-7 text-xs font-mono px-1.5"
                     />
                   </div>
@@ -586,12 +630,9 @@ export default function Setup() {
                         onChange={(e) => setForm((prev) => ({ ...prev, primaryColor: e.target.value }))}
                         className="w-8 h-8 rounded border cursor-pointer shrink-0"
                       />
-                      <Input
-                        value={form.primaryColor.toUpperCase()}
-                        onChange={(e) => {
-                          const v = e.target.value.startsWith("#") ? e.target.value : `#${e.target.value}`;
-                          if (/^#[0-9a-fA-F]{6}$/.test(v)) setForm((prev) => ({ ...prev, primaryColor: v }));
-                        }}
+                      <HexColorInput
+                        value={form.primaryColor}
+                        onChange={(v) => setForm((prev) => ({ ...prev, primaryColor: v }))}
                         className="flex-1 h-8 text-xs font-mono"
                       />
                     </div>
@@ -605,12 +646,9 @@ export default function Setup() {
                         onChange={(e) => setForm((prev) => ({ ...prev, buttonBgColor: e.target.value }))}
                         className="w-8 h-8 rounded border cursor-pointer shrink-0"
                       />
-                      <Input
-                        value={form.buttonBgColor.toUpperCase()}
-                        onChange={(e) => {
-                          const v = e.target.value.startsWith("#") ? e.target.value : `#${e.target.value}`;
-                          if (/^#[0-9a-fA-F]{6}$/.test(v)) setForm((prev) => ({ ...prev, buttonBgColor: v }));
-                        }}
+                      <HexColorInput
+                        value={form.buttonBgColor}
+                        onChange={(v) => setForm((prev) => ({ ...prev, buttonBgColor: v }))}
                         className="flex-1 h-8 text-xs font-mono"
                       />
                     </div>

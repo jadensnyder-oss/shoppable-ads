@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import type { PartnerConfig } from "@shared/schema";
 import { isColorDark } from "@/lib/utils";
 
@@ -9,6 +10,22 @@ export function PlacementHeader({ config }: HeaderProps) {
   const { partner, advertiser } = config;
   const bgColor = partner.headerBgColor || "#ffffff";
   const dark = isColorDark(bgColor);
+  const [svgContent, setSvgContent] = useState<string | null>(null);
+  const isSvg = partner.logo?.toLowerCase().endsWith(".svg");
+
+  useEffect(() => {
+    if (!partner.logo || !isSvg) {
+      setSvgContent(null);
+      return;
+    }
+    fetch(partner.logo)
+      .then((res) => res.text())
+      .then((text) => {
+        if (text.includes("<svg")) setSvgContent(text);
+        else setSvgContent(null);
+      })
+      .catch(() => setSvgContent(null));
+  }, [partner.logo, isSvg]);
 
   return (
     <div
@@ -22,11 +39,24 @@ export function PlacementHeader({ config }: HeaderProps) {
 
       <div className="flex flex-col items-center gap-[4px]">
         {partner.logo ? (
-          <img
-            src={partner.logo}
-            alt={partner.name}
-            className="h-[18px] w-[75%] object-contain shrink-0"
-          />
+          isSvg && svgContent && partner.logoColor ? (
+            <div
+              className="h-[18px] w-[75%] flex items-center justify-center [&_svg]:h-full [&_svg]:w-auto [&_svg]:object-contain"
+              style={{ color: partner.logoColor }}
+              dangerouslySetInnerHTML={{
+                __html: svgContent.replace(
+                  /fill="[^"]*"/g,
+                  'fill="currentColor"'
+                ),
+              }}
+            />
+          ) : (
+            <img
+              src={partner.logo}
+              alt={partner.name}
+              className="h-[18px] w-[75%] object-contain shrink-0"
+            />
+          )
         ) : (
           <span
             className="text-[18px] font-bold tracking-tight shrink-0"

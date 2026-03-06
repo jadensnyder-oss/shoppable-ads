@@ -18,7 +18,7 @@ export function BottomSheet({
   const { partner, advertiser } = config;
   const brandName = advertiser.brandName || "Brand";
   const br = partner.borderRadius || "8px";
-  const btnBr = partner.buttonBorderRadius || "8px";
+  const btnBr = partner.buttonBorderRadius || "100px";
 
   return (
     <AnimatePresence>

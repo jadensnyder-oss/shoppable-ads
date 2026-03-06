@@ -221,7 +221,7 @@ export default function Home() {
             ))}
 
             <Card
-              className="border-dashed hover:border-primary/50 transition-colors cursor-pointer flex items-center justify-center"
+              className="border-0 shadow-none hover:bg-muted/50 transition-colors cursor-pointer flex items-center justify-center py-12"
               onClick={() => navigate("/setup")}
             >
               <div className="flex flex-col items-center gap-2 text-muted-foreground">

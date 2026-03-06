@@ -17,6 +17,11 @@ export const partnerSchema = z.object({
   buttonBorderRadius: z.string().default("100px"),
   buttonBorder: z.string().default("none"),
 
+  secondaryButtonBgColor: z.string().default("transparent"),
+  secondaryButtonTextColor: z.string().default("#000000"),
+  secondaryButtonBorder: z.string().default("1px solid #0f0f0f"),
+
+  logoColor: z.string().nullable().default(null),
   headerBgColor: z.string().default("#ffffff"),
   headerBgImage: z.string().nullable().default(null),
 
@@ -74,6 +79,10 @@ export interface PartnerConfig {
     buttonTextColor: string;
     buttonBorderRadius: string;
     buttonBorder: string;
+    secondaryButtonBgColor: string;
+    secondaryButtonTextColor: string;
+    secondaryButtonBorder: string;
+    logoColor: string | null;
     headerBgColor: string;
     headerBgImage: string | null;
     checkoutHtml: string | null;
@@ -116,6 +125,10 @@ export function partnerToConfig(p: Partner): PartnerConfig {
       buttonTextColor: p.buttonTextColor,
       buttonBorderRadius: p.buttonBorderRadius,
       buttonBorder: p.buttonBorder,
+      secondaryButtonBgColor: p.secondaryButtonBgColor,
+      secondaryButtonTextColor: p.secondaryButtonTextColor,
+      secondaryButtonBorder: p.secondaryButtonBorder,
+      logoColor: p.logoColor,
       headerBgColor: p.headerBgColor,
       headerBgImage: p.headerBgImage,
       checkoutHtml: p.checkoutHtml,

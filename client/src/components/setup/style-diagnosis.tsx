@@ -54,6 +54,32 @@ interface StyleDiagnosisProps {
   customFonts?: string[];
 }
 
+function HexColorInput({
+  value,
+  onChange,
+  className,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  className?: string;
+}) {
+  const [raw, setRaw] = useState(value);
+  useEffect(() => { setRaw(value); }, [value]);
+  return (
+    <Input
+      value={raw.toUpperCase()}
+      onChange={(e) => {
+        const text = e.target.value;
+        setRaw(text);
+        const v = text.startsWith("#") ? text : `#${text}`;
+        if (/^#[0-9a-fA-F]{6}$/.test(v)) onChange(v);
+      }}
+      onBlur={() => setRaw(value)}
+      className={className}
+    />
+  );
+}
+
 function ColorSwatch({
   label,
   value,
@@ -67,11 +93,6 @@ function ColorSwatch({
   source?: string;
   onChange: (val: string) => void;
 }) {
-  const handleHexInput = (raw: string) => {
-    const v = raw.startsWith("#") ? raw : `#${raw}`;
-    if (/^#[0-9a-fA-F]{6}$/.test(v)) onChange(v);
-  };
-
   return (
     <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
       <input
@@ -83,9 +104,9 @@ function ColorSwatch({
       <div className="flex-1">
         <p className="text-sm font-medium">{label}</p>
         <div className="flex items-center gap-2">
-          <Input
-            value={value.toUpperCase()}
-            onChange={(e) => handleHexInput(e.target.value)}
+          <HexColorInput
+            value={value}
+            onChange={onChange}
             className="w-24 h-6 text-xs font-mono px-1.5"
           />
           <span className="text-xs text-muted-foreground">
@@ -409,12 +430,9 @@ export function StyleDiagnosis({
                     onChange={(e) => update("buttonBgColor", e.target.value)}
                     className="w-8 h-8 rounded border cursor-pointer shrink-0"
                   />
-                  <Input
-                    value={(overrides.buttonBgColor || styles.buttonStyles.bgColor).toUpperCase()}
-                    onChange={(e) => {
-                      const v = e.target.value.startsWith("#") ? e.target.value : `#${e.target.value}`;
-                      if (/^#[0-9a-fA-F]{6}$/.test(v)) update("buttonBgColor", v);
-                    }}
+                  <HexColorInput
+                    value={overrides.buttonBgColor || styles.buttonStyles.bgColor}
+                    onChange={(v) => update("buttonBgColor", v)}
                     className="flex-1 h-8 text-xs font-mono"
                   />
                 </div>
@@ -432,12 +450,9 @@ export function StyleDiagnosis({
                     onChange={(e) => update("buttonTextColor", e.target.value)}
                     className="w-8 h-8 rounded border cursor-pointer shrink-0"
                   />
-                  <Input
-                    value={(overrides.buttonTextColor || styles.buttonStyles.textColor).toUpperCase()}
-                    onChange={(e) => {
-                      const v = e.target.value.startsWith("#") ? e.target.value : `#${e.target.value}`;
-                      if (/^#[0-9a-fA-F]{6}$/.test(v)) update("buttonTextColor", v);
-                    }}
+                  <HexColorInput
+                    value={overrides.buttonTextColor || styles.buttonStyles.textColor}
+                    onChange={(v) => update("buttonTextColor", v)}
                     className="flex-1 h-8 text-xs font-mono"
                   />
                 </div>
@@ -447,22 +462,105 @@ export function StyleDiagnosis({
         </div>
       )}
 
+      {/* Secondary Button */}
+      <div className="flex flex-col gap-2">
+        <h3 className="text-sm font-semibold">Secondary Button (Decline)</h3>
+        <div className="p-3 bg-muted/30 rounded-lg">
+          <div className="flex items-center gap-4 mb-2">
+            <div
+              className="px-6 py-2 text-sm font-medium"
+              style={{
+                backgroundColor: overrides.secondaryButtonBgColor || "transparent",
+                color: overrides.secondaryButtonTextColor || "#000000",
+                border: overrides.secondaryButtonBorder || "1px solid #0f0f0f",
+                borderRadius: overrides.buttonBorderRadius || (styles.buttonStyles?.borderRadius ?? "100px"),
+              }}
+            >
+              Decline offer
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2 mt-2">
+            <div>
+              <label className="text-xs text-muted-foreground">Background</label>
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="color"
+                  value={overrides.secondaryButtonBgColor || "#ffffff"}
+                  onChange={(e) => update("secondaryButtonBgColor", e.target.value)}
+                  className="w-8 h-8 rounded border cursor-pointer shrink-0"
+                />
+                <HexColorInput
+                  value={overrides.secondaryButtonBgColor || "transparent"}
+                  onChange={(v) => update("secondaryButtonBgColor", v)}
+                  className="flex-1 h-8 text-xs font-mono"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Text Color</label>
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="color"
+                  value={overrides.secondaryButtonTextColor || "#000000"}
+                  onChange={(e) => update("secondaryButtonTextColor", e.target.value)}
+                  className="w-8 h-8 rounded border cursor-pointer shrink-0"
+                />
+                <HexColorInput
+                  value={overrides.secondaryButtonTextColor || "#000000"}
+                  onChange={(v) => update("secondaryButtonTextColor", v)}
+                  className="flex-1 h-8 text-xs font-mono"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="mt-2">
+            <label className="text-xs text-muted-foreground">Border</label>
+            <Input
+              value={overrides.secondaryButtonBorder || "1px solid #0f0f0f"}
+              onChange={(e) => update("secondaryButtonBorder", e.target.value)}
+              className="h-8 text-xs font-mono"
+              placeholder="e.g. 1px solid #0f0f0f"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Border Radius */}
       {styles.borderRadius && (
         <div className="flex flex-col gap-2">
           <h3 className="text-sm font-semibold">Border Radius</h3>
-          <div className="p-3 bg-muted/30 rounded-lg flex items-center gap-4">
-            <div
-              className="w-12 h-12 bg-primary/10 border-2 border-primary/30 shrink-0"
-              style={{
-                borderRadius:
-                  overrides.borderRadius || `${parsePx(styles.borderRadius.value)}px`,
-              }}
-            />
-            <RadiusStepper
-              value={overrides.borderRadius || styles.borderRadius.value}
-              onChange={(v) => update("borderRadius", v)}
-            />
+          <div className="p-3 bg-muted/30 rounded-lg flex flex-col gap-3">
+            <div className="flex items-center gap-4">
+              <div
+                className="w-12 h-12 bg-primary/10 border-2 border-primary/30 shrink-0"
+                style={{
+                  borderRadius:
+                    overrides.borderRadius || `${parsePx(styles.borderRadius.value)}px`,
+                }}
+              />
+              <div>
+                <label className="text-xs text-muted-foreground">Container</label>
+                <RadiusStepper
+                  value={overrides.borderRadius || styles.borderRadius.value}
+                  onChange={(v) => update("borderRadius", v)}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div
+                className="w-20 h-8 bg-primary/10 border-2 border-primary/30 shrink-0"
+                style={{
+                  borderRadius: overrides.buttonBorderRadius || (styles.buttonStyles?.borderRadius ?? "100px"),
+                }}
+              />
+              <div>
+                <label className="text-xs text-muted-foreground">Buttons</label>
+                <RadiusStepper
+                  value={overrides.buttonBorderRadius || (styles.buttonStyles?.borderRadius ?? "100px")}
+                  onChange={(v) => update("buttonBorderRadius", v)}
+                />
+              </div>
+            </div>
           </div>
         </div>
       )}
