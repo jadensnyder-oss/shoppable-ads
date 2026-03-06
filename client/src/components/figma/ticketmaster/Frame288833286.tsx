@@ -88,7 +88,7 @@ function Frame8() {
       <div className="h-0 relative shrink-0 w-[20px]">
         <div className="absolute inset-[-1px_-2.5%]">
           <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 21 2">
-            <path d="M0.5 1H20.5" id="Line 1" stroke="var(--stroke-0, #024DDF)" strokeLinecap="round" strokeWidth="2" />
+            <path d="M0.5 1H20.5" id="Line 1" stroke="var(--stroke-0, #024DDF)" strokeLinecap="round" strokeWidth="1" />
           </svg>
         </div>
       </div>
@@ -99,7 +99,7 @@ function Frame8() {
       <div className="h-0 relative shrink-0 w-[20px]">
         <div className="absolute inset-[-1px_-2.5%]">
           <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 21 2">
-            <path d="M0.5 1H20.5" id="Line 2" stroke="var(--stroke-0, #CFCFCF)" strokeLinecap="round" strokeWidth="2" />
+            <path d="M0.5 1H20.5" id="Line 2" stroke="var(--stroke-0, #CFCFCF)" strokeLinecap="round" strokeWidth="1" />
           </svg>
         </div>
       </div>
