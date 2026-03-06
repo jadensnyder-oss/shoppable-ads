@@ -418,7 +418,7 @@ export default function Setup() {
               <div className="flex flex-col items-center gap-3">
                 <Label className="text-xs self-start">Logo (SVG preferred)</Label>
                 {form.logo ? (
-                  <div className="relative w-[120px] h-[120px] rounded-xl border bg-white flex items-center justify-center overflow-hidden">
+                  <div className="relative w-full h-[140px] rounded-xl border bg-white flex items-center justify-center overflow-hidden">
                     {svgContent ? (
                       <div
                         className="w-full h-full p-3 flex items-center justify-center [&_svg]:w-full [&_svg]:h-full [&_svg]:object-contain"
@@ -451,7 +451,7 @@ export default function Setup() {
                   <button
                     onClick={() => logoInputRef.current?.click()}
                     disabled={logoUploading}
-                    className="w-[120px] h-[120px] border-2 border-dashed rounded-xl flex flex-col items-center justify-center text-muted-foreground hover:border-primary/50 transition-colors cursor-pointer"
+                    className="w-full h-[140px] border-2 border-dashed rounded-xl flex flex-col items-center justify-center text-muted-foreground hover:border-primary/50 transition-colors cursor-pointer"
                   >
                     {logoUploading ? (
                       <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
