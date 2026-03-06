@@ -26,6 +26,12 @@ async function buildAll() {
     external: ["lightningcss", "esbuild", "vite", "tsx"],
     target: "node20",
     sourcemap: true,
+    banner: {
+      js: 'const _importMetaUrl = require("url").pathToFileURL(__filename).href;',
+    },
+    define: {
+      "import.meta.url": "_importMetaUrl",
+    },
   });
 
   console.log("Build complete!");
