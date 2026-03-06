@@ -3,12 +3,12 @@ import { useLocation } from "wouter";
 import { AnimatePresence, motion } from "framer-motion";
 import { Home, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { LoadingScreen } from "@/components/demo/loading-screen";
+import { PostConfirmationScreen } from "@/components/demo/post-confirmation-screen";
 import CheckoutView from "@/components/figma/ticketmaster/CheckoutView";
 import InterstitialView from "@/components/figma/ticketmaster/InterstitialView";
 import PaymentSheet from "@/components/figma/ticketmaster/PaymentSheet";
 import TicketmasterConfirmation from "@/components/figma/ticketmaster/TicketmasterConfirmation";
-import TicketmasterLoader from "@/components/figma/ticketmaster/TicketmasterLoader";
+import TmCheckoutLoader from "@/components/figma/ticketmaster/TmCheckoutLoader";
 import "@/components/figma/ticketmaster/fonts.css";
 
 type DemoStep =
@@ -25,31 +25,7 @@ const dissolve = {
   transition: { duration: 0.4 },
 };
 
-const funPopIn = {
-  initial: { opacity: 0, scale: 0.96 },
-  animate: { opacity: 1, scale: 1 },
-  exit: { opacity: 0 },
-  transition: { duration: 0.5, ease: [0.34, 1.56, 0.64, 1] },
-};
-
 const TM_BLUE = "#024ddf";
-
-function ConfirmLoadingStep({ onComplete }: { onComplete: () => void }) {
-  useEffect(() => {
-    const timer = setTimeout(onComplete, 3000);
-    return () => clearTimeout(timer);
-  }, [onComplete]);
-
-  return (
-    <motion.div
-      key="confirmLoading"
-      className="absolute inset-0"
-      {...dissolve}
-    >
-      <TicketmasterLoader />
-    </motion.div>
-  );
-}
 
 export default function TicketmasterDemo() {
   const [, navigate] = useLocation();
@@ -151,13 +127,9 @@ export default function TicketmasterDemo() {
             <motion.div
               key="loading"
               className="absolute inset-0"
-              {...funPopIn}
+              {...dissolve}
             >
-              <LoadingScreen
-                message="Processing your order..."
-                primaryColor={TM_BLUE}
-                onComplete={handleLoadingComplete}
-              />
+              <TmCheckoutLoader onComplete={handleLoadingComplete} />
             </motion.div>
           )}
 
@@ -180,9 +152,19 @@ export default function TicketmasterDemo() {
           )}
 
           {currentStep === "confirmLoading" && (
-            <ConfirmLoadingStep
-              onComplete={handleConfirmLoadingComplete}
-            />
+            <motion.div
+              key="confirmLoading"
+              className="absolute inset-0"
+              {...dissolve}
+            >
+              <PostConfirmationScreen
+                primaryColor={TM_BLUE}
+                partnerName="Ticketmaster"
+                advertiserName="Dagne Dover"
+                addedToOrder
+                onComplete={handleConfirmLoadingComplete}
+              />
+            </motion.div>
           )}
 
           {currentStep === "confirmation" && (

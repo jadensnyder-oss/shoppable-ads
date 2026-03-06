@@ -70,26 +70,40 @@ function Frame10() {
   );
 }
 
+function GiftIcon() {
+  return (
+    <svg className="shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#024DDF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="8" width="18" height="4" rx="1" />
+      <path d="M12 8v13" />
+      <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" />
+      <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5" />
+    </svg>
+  );
+}
+
 function Frame8() {
   return (
     <div className="content-stretch flex gap-[8px] items-center justify-center relative shrink-0">
       <Frame10 />
       <div className="h-0 relative shrink-0 w-[20px]">
-        <div className="absolute inset-[-0.5px_-2.5%]">
-          <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 21 1">
-            <path d="M0.5 0.5H20.5" id="Line 1" stroke="var(--stroke-0, #024DDF)" strokeLinecap="round" />
+        <div className="absolute inset-[-1px_-2.5%]">
+          <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 21 2">
+            <path d="M0.5 1H20.5" id="Line 1" stroke="var(--stroke-0, #024DDF)" strokeLinecap="round" strokeWidth="2" />
           </svg>
         </div>
       </div>
-      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#024ddf] text-[12px] whitespace-nowrap">Special Offer</p>
+      <div className="flex gap-[4px] items-center shrink-0">
+        <GiftIcon />
+        <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#024ddf] text-[12px] whitespace-nowrap">Exclusive Offer</p>
+      </div>
       <div className="h-0 relative shrink-0 w-[20px]">
-        <div className="absolute inset-[-0.5px_-2.5%]">
-          <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 21 1">
-            <path d="M0.5 0.5H20.5" id="Line 2" stroke="var(--stroke-0, #CFCFCF)" strokeLinecap="round" />
+        <div className="absolute inset-[-1px_-2.5%]">
+          <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 21 2">
+            <path d="M0.5 1H20.5" id="Line 2" stroke="var(--stroke-0, #CFCFCF)" strokeLinecap="round" strokeWidth="2" />
           </svg>
         </div>
       </div>
-      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#a1a5a4] text-[12px] whitespace-nowrap">Order Summary</p>
+      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#a1a5a4] text-[12px] whitespace-nowrap">Confirmation</p>
     </div>
   );
 }
