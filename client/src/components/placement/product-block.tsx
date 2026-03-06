@@ -334,13 +334,12 @@ export function ProductBlock({
         </div>
       </div>
 
-      <p className="text-center w-full"
-        style={{ fontSize: scale(12), fontFamily: "'Inter', sans-serif", color: "#5f5f5f" }}>
-        Don&apos;t worry, your card won&apos;t be charged yet.
-      </p>
-
       {/* CTA Buttons */}
-      <div className="flex flex-col gap-[8px] items-start w-full">
+      <div className="flex flex-col gap-[12px] items-center w-full">
+        <p className="text-center w-full"
+          style={{ fontSize: scale(12), fontFamily: "'Inter', sans-serif", color: "#5f5f5f" }}>
+          Don&apos;t worry, your card won&apos;t be charged yet.
+        </p>
         <button
           onClick={onAddToOrder}
           className="h-[42px] rounded-[100px] w-full flex items-center justify-center cursor-pointer transition-opacity hover:opacity-90 active:scale-[0.98]"
