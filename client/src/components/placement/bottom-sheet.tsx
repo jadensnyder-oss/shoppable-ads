@@ -17,6 +17,8 @@ export function BottomSheet({
 }: BottomSheetProps) {
   const { partner, advertiser } = config;
   const brandName = advertiser.brandName || "Brand";
+  const br = partner.borderRadius || "8px";
+  const btnBr = partner.buttonBorderRadius || "8px";
 
   return (
     <AnimatePresence>
@@ -82,7 +84,7 @@ export function BottomSheet({
             <div className="flex flex-col gap-[16px] items-center w-full">
               {/* Payment Method */}
               <div className="flex flex-col items-start w-[361px] mx-auto">
-                <div className="bg-white rounded-tl-[8px] rounded-tr-[8px] w-full relative">
+                <div className="bg-white w-full relative" style={{ borderTopLeftRadius: br, borderTopRightRadius: br }}>
                   <div className="flex items-center gap-[8px] p-[16px]">
                     <CreditCard className="w-4 h-4 shrink-0" style={{ color: "#242424" }} />
                     <p
@@ -96,9 +98,9 @@ export function BottomSheet({
                       Payment Method
                     </p>
                   </div>
-                  <div className="absolute inset-0 pointer-events-none border-b border-[#eaecf0] rounded-tl-[8px] rounded-tr-[8px]" />
+                  <div className="absolute inset-0 pointer-events-none border-b border-[#eaecf0]" style={{ borderTopLeftRadius: br, borderTopRightRadius: br }} />
                 </div>
-                <div className="bg-white h-[56px] rounded-bl-[8px] rounded-br-[8px] w-full flex items-center">
+                <div className="bg-white h-[56px] w-full flex items-center" style={{ borderBottomLeftRadius: br, borderBottomRightRadius: br }}>
                   <div className="flex items-center justify-between p-[16px] w-full">
                     <div className="flex items-center gap-[8px]">
                       <div className="flex items-center justify-center w-[36px] h-[24px] rounded-[4px] border border-[#e0e0e0]">
@@ -131,7 +133,7 @@ export function BottomSheet({
 
               {/* Shipping Address */}
               <div className="flex flex-col items-start w-[361px] mx-auto">
-                <div className="bg-white rounded-tl-[8px] rounded-tr-[8px] w-full relative">
+                <div className="bg-white w-full relative" style={{ borderTopLeftRadius: br, borderTopRightRadius: br }}>
                   <div className="flex items-center gap-[8px] p-[16px]">
                     <Truck className="w-4 h-4 shrink-0" style={{ color: "#242424" }} />
                     <p
@@ -145,9 +147,9 @@ export function BottomSheet({
                       Shipping Address
                     </p>
                   </div>
-                  <div className="absolute inset-0 pointer-events-none border-b border-[#eaecf0] rounded-tl-[8px] rounded-tr-[8px]" />
+                  <div className="absolute inset-0 pointer-events-none border-b border-[#eaecf0]" style={{ borderTopLeftRadius: br, borderTopRightRadius: br }} />
                 </div>
-                <div className="bg-white rounded-bl-[8px] rounded-br-[8px] w-full flex items-center">
+                <div className="bg-white w-full flex items-center" style={{ borderBottomLeftRadius: br, borderBottomRightRadius: br }}>
                   <div className="flex items-center justify-between p-[16px] w-full">
                     <div className="flex items-start gap-[8px] flex-1">
                       <Mail className="w-4 h-4 shrink-0 mt-[3px]" style={{ color: "#242424" }} />
@@ -259,9 +261,10 @@ export function BottomSheet({
                     {/* Confirm button */}
                     <button
                       onClick={onConfirm}
-                      className="h-[46px] rounded-[8px] shadow-sm w-[361px] mx-auto flex items-center justify-center cursor-pointer transition-opacity hover:opacity-90 active:scale-[0.98]"
+                      className="h-[46px] shadow-sm w-[361px] mx-auto flex items-center justify-center cursor-pointer transition-opacity hover:opacity-90 active:scale-[0.98]"
                       style={{
                         backgroundColor: partner.buttonBgColor || "#000000",
+                        borderRadius: btnBr,
                       }}
                     >
                       <span

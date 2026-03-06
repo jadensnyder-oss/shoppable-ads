@@ -14,9 +14,11 @@ interface ProductBlockProps {
 function Countdown({
   seconds,
   primaryColor,
+  borderRadius,
 }: {
   seconds: number;
   primaryColor: string;
+  borderRadius: string;
 }) {
   const [remaining, setRemaining] = useState(seconds);
 
@@ -33,8 +35,8 @@ function Countdown({
   const display = `${mins}:${secs.toString().padStart(2, "0")}`;
 
   return (
-    <div className="bg-[#fafafa] flex gap-[12px] items-center px-[16px] py-[14px] relative rounded-[8px] w-full">
-      <div className="absolute border border-[#cacaca] border-solid inset-[-0.5px] pointer-events-none rounded-[8.5px]" />
+    <div className="bg-[#fafafa] flex gap-[12px] items-center px-[16px] py-[14px] relative w-full" style={{ borderRadius }}>
+      <div className="absolute border border-[#cacaca] border-solid inset-[-0.5px] pointer-events-none" style={{ borderRadius }} />
       <Gift className="w-6 h-6 shrink-0" style={{ color: primaryColor }} />
       <div className="flex-1 text-center">
         <p style={{ fontSize: scale(16), color: primaryColor }}>
@@ -64,7 +66,7 @@ function Countdown({
   );
 }
 
-function ImageCarousel({ images, primaryColor }: { images: string[]; primaryColor: string }) {
+function ImageCarousel({ images, primaryColor, borderRadius }: { images: string[]; primaryColor: string; borderRadius: string }) {
   const [current, setCurrent] = useState(0);
   const displayImages = images.length > 0 ? images : [];
 
@@ -82,13 +84,13 @@ function ImageCarousel({ images, primaryColor }: { images: string[]; primaryColo
 
   if (displayImages.length === 0) {
     return (
-      <div className="w-full aspect-square bg-[#cacaca] rounded-[16px]" />
+      <div className="w-full aspect-square bg-[#cacaca]" style={{ borderRadius }} />
     );
   }
 
   return (
     <div className="flex flex-col gap-[12px] w-full">
-      <div className="w-full aspect-square rounded-[16px] overflow-hidden relative">
+      <div className="w-full aspect-square overflow-hidden relative" style={{ borderRadius }}>
         <img
           src={displayImages[current]}
           alt="Product"
@@ -117,8 +119,9 @@ function ImageCarousel({ images, primaryColor }: { images: string[]; primaryColo
             <button
               key={i}
               onClick={() => setCurrent(i)}
-              className="w-[48px] h-[48px] rounded-[8px] overflow-hidden cursor-pointer transition-opacity shrink-0"
+              className="w-[48px] h-[48px] overflow-hidden cursor-pointer transition-opacity shrink-0"
               style={{
+                borderRadius,
                 border: i === current ? `2px solid ${primaryColor}` : "1px solid #e0e0e0",
                 opacity: i === current ? 1 : 0.7,
               }}
@@ -158,12 +161,13 @@ export function ProductBlock({
         <Countdown
           seconds={advertiser.countdownSeconds}
           primaryColor={primaryColor}
+          borderRadius={partner.borderRadius || "8px"}
         />
       </div>
 
       {/* Image carousel + Product details */}
       <div className="flex flex-col gap-[24px] items-start w-full">
-        <ImageCarousel images={advertiser.productImages} primaryColor={primaryColor} />
+        <ImageCarousel images={advertiser.productImages} primaryColor={primaryColor} borderRadius={partner.borderRadius || "8px"} />
 
         <div className="flex flex-col gap-[24px] items-start w-full">
           {/* Badges + Brand + Title */}
@@ -308,7 +312,7 @@ export function ProductBlock({
             <div className="flex flex-col gap-[8px] items-start w-full">
               {advertiser.variants.map((variant) => (
                 <div key={variant.label} className="w-full">
-                  <div className="bg-white h-[44px] rounded-[8px] border border-[#cacaca] flex items-center justify-between px-[12px] w-full">
+                  <div className="bg-white h-[44px] border border-[#cacaca] flex items-center justify-between px-[12px] w-full" style={{ borderRadius: partner.borderRadius || "8px" }}>
                     <div className="flex items-center gap-[6px]">
                       <span style={{ fontSize: scale(14), fontFamily: "'Inter', sans-serif", color: "#242424" }}>
                         {variant.label}:

@@ -472,7 +472,15 @@ export default function Setup() {
                       onChange={(e) =>
                         setForm((prev) => ({ ...prev, logoColor: e.target.value }))
                       }
-                      className="w-7 h-7 rounded border cursor-pointer"
+                      className="w-7 h-7 rounded border cursor-pointer shrink-0"
+                    />
+                    <Input
+                      value={form.logoColor.toUpperCase()}
+                      onChange={(e) => {
+                        const v = e.target.value.startsWith("#") ? e.target.value : `#${e.target.value}`;
+                        if (/^#[0-9a-fA-F]{6}$/.test(v)) setForm((prev) => ({ ...prev, logoColor: v }));
+                      }}
+                      className="w-24 h-7 text-xs font-mono px-1.5"
                     />
                   </div>
                 )}
@@ -571,21 +579,41 @@ export default function Setup() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-lg mx-auto">
                   <div className="flex flex-col gap-1">
                     <Label className="text-xs">Primary Color</Label>
-                    <input
-                      type="color"
-                      value={form.primaryColor}
-                      onChange={(e) => setForm((prev) => ({ ...prev, primaryColor: e.target.value }))}
-                      className="w-full h-10 rounded border cursor-pointer"
-                    />
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="color"
+                        value={form.primaryColor}
+                        onChange={(e) => setForm((prev) => ({ ...prev, primaryColor: e.target.value }))}
+                        className="w-8 h-8 rounded border cursor-pointer shrink-0"
+                      />
+                      <Input
+                        value={form.primaryColor.toUpperCase()}
+                        onChange={(e) => {
+                          const v = e.target.value.startsWith("#") ? e.target.value : `#${e.target.value}`;
+                          if (/^#[0-9a-fA-F]{6}$/.test(v)) setForm((prev) => ({ ...prev, primaryColor: v }));
+                        }}
+                        className="flex-1 h-8 text-xs font-mono"
+                      />
+                    </div>
                   </div>
                   <div className="flex flex-col gap-1">
                     <Label className="text-xs">Button Color</Label>
-                    <input
-                      type="color"
-                      value={form.buttonBgColor}
-                      onChange={(e) => setForm((prev) => ({ ...prev, buttonBgColor: e.target.value }))}
-                      className="w-full h-10 rounded border cursor-pointer"
-                    />
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="color"
+                        value={form.buttonBgColor}
+                        onChange={(e) => setForm((prev) => ({ ...prev, buttonBgColor: e.target.value }))}
+                        className="w-8 h-8 rounded border cursor-pointer shrink-0"
+                      />
+                      <Input
+                        value={form.buttonBgColor.toUpperCase()}
+                        onChange={(e) => {
+                          const v = e.target.value.startsWith("#") ? e.target.value : `#${e.target.value}`;
+                          if (/^#[0-9a-fA-F]{6}$/.test(v)) setForm((prev) => ({ ...prev, buttonBgColor: v }));
+                        }}
+                        className="flex-1 h-8 text-xs font-mono"
+                      />
+                    </div>
                   </div>
                   <div className="flex flex-col gap-1">
                     <Label className="text-xs">Font</Label>

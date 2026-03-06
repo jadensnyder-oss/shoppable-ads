@@ -49,12 +49,26 @@ export function ContentEntry({ values, onChange }: ContentEntryProps) {
       });
       if (!res.ok) throw new Error("Upload failed");
       const data = await res.json();
-      update("productImage", data.url);
-      update("productImages", [...values.productImages, data.url]);
+      const newImages = [...values.productImages, data.url];
+      onChange({
+        ...values,
+        productImage: values.productImage || data.url,
+        productImages: newImages,
+      });
     } catch (err) {
       console.error("Image upload failed:", err);
       toast.error("Image upload failed. Please try again.");
     }
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = values.productImages.filter((_, i) => i !== index);
+    onChange({
+      ...values,
+      productImages: newImages,
+      productImage: newImages[0] || "",
+    });
   };
 
   const addBadge = () => {
@@ -70,23 +84,16 @@ export function ContentEntry({ values, onChange }: ContentEntryProps) {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1.5">
-          <Label>Advertiser / Brand Name</Label>
-          <Input
-            value={values.advertiserBrand}
-            onChange={(e) => update("advertiserBrand", e.target.value)}
-            placeholder="e.g. Palmes"
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label>Sold By</Label>
-          <Input
-            value={values.soldBy}
-            onChange={(e) => update("soldBy", e.target.value)}
-            placeholder="e.g. Palmes"
-          />
-        </div>
+      <div className="flex flex-col gap-1.5">
+        <Label>Advertiser / Brand Name</Label>
+        <Input
+          value={values.advertiserBrand}
+          onChange={(e) => {
+            const v = e.target.value;
+            onChange({ ...values, advertiserBrand: v, soldBy: v });
+          }}
+          placeholder="e.g. Palmes"
+        />
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -137,23 +144,23 @@ export function ContentEntry({ values, onChange }: ContentEntryProps) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label>Product Image</Label>
-        <div className="flex gap-3 items-start">
-          {values.productImage ? (
-            <div className="relative w-20 h-20 rounded-lg overflow-hidden border">
+        <Label>Product Images</Label>
+        <div className="flex gap-3 items-start flex-wrap">
+          {values.productImages.map((img, i) => (
+            <div key={`${img}-${i}`} className="relative w-20 h-20 rounded-lg overflow-hidden border">
               <img
-                src={values.productImage}
-                alt="Product"
+                src={img}
+                alt={`Product ${i + 1}`}
                 className="w-full h-full object-cover"
               />
               <button
-                onClick={() => update("productImage", "")}
-                className="absolute top-1 right-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center"
+                onClick={() => removeImage(i)}
+                className="absolute top-1 right-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center cursor-pointer"
               >
                 <X className="w-3 h-3 text-white" />
               </button>
             </div>
-          ) : null}
+          ))}
           <button
             onClick={() => fileInputRef.current?.click()}
             className="w-20 h-20 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-muted-foreground hover:border-primary/50 transition-colors cursor-pointer"

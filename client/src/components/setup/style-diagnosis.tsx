@@ -67,22 +67,33 @@ function ColorSwatch({
   source?: string;
   onChange: (val: string) => void;
 }) {
+  const handleHexInput = (raw: string) => {
+    const v = raw.startsWith("#") ? raw : `#${raw}`;
+    if (/^#[0-9a-fA-F]{6}$/.test(v)) onChange(v);
+  };
+
   return (
     <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
       <input
         type="color"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-10 h-10 rounded border border-border cursor-pointer"
+        className="w-10 h-10 rounded border border-border cursor-pointer shrink-0"
       />
       <div className="flex-1">
         <p className="text-sm font-medium">{label}</p>
-        <p className="text-xs text-muted-foreground">
-          {value.toUpperCase()}
-          {source && ` • from ${source}`}
-          {confidence !== undefined &&
-            ` • ${Math.round(confidence * 100)}% confidence`}
-        </p>
+        <div className="flex items-center gap-2">
+          <Input
+            value={value.toUpperCase()}
+            onChange={(e) => handleHexInput(e.target.value)}
+            className="w-24 h-6 text-xs font-mono px-1.5"
+          />
+          <span className="text-xs text-muted-foreground">
+            {source && `from ${source}`}
+            {confidence !== undefined &&
+              ` • ${Math.round(confidence * 100)}%`}
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -389,27 +400,47 @@ export function StyleDiagnosis({
                 <label className="text-xs text-muted-foreground">
                   Background
                 </label>
-                <input
-                  type="color"
-                  value={
-                    overrides.buttonBgColor || styles.buttonStyles.bgColor
-                  }
-                  onChange={(e) => update("buttonBgColor", e.target.value)}
-                  className="w-full h-8 rounded border cursor-pointer"
-                />
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="color"
+                    value={
+                      overrides.buttonBgColor || styles.buttonStyles.bgColor
+                    }
+                    onChange={(e) => update("buttonBgColor", e.target.value)}
+                    className="w-8 h-8 rounded border cursor-pointer shrink-0"
+                  />
+                  <Input
+                    value={(overrides.buttonBgColor || styles.buttonStyles.bgColor).toUpperCase()}
+                    onChange={(e) => {
+                      const v = e.target.value.startsWith("#") ? e.target.value : `#${e.target.value}`;
+                      if (/^#[0-9a-fA-F]{6}$/.test(v)) update("buttonBgColor", v);
+                    }}
+                    className="flex-1 h-8 text-xs font-mono"
+                  />
+                </div>
               </div>
               <div>
                 <label className="text-xs text-muted-foreground">
                   Text Color
                 </label>
-                <input
-                  type="color"
-                  value={
-                    overrides.buttonTextColor || styles.buttonStyles.textColor
-                  }
-                  onChange={(e) => update("buttonTextColor", e.target.value)}
-                  className="w-full h-8 rounded border cursor-pointer"
-                />
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="color"
+                    value={
+                      overrides.buttonTextColor || styles.buttonStyles.textColor
+                    }
+                    onChange={(e) => update("buttonTextColor", e.target.value)}
+                    className="w-8 h-8 rounded border cursor-pointer shrink-0"
+                  />
+                  <Input
+                    value={(overrides.buttonTextColor || styles.buttonStyles.textColor).toUpperCase()}
+                    onChange={(e) => {
+                      const v = e.target.value.startsWith("#") ? e.target.value : `#${e.target.value}`;
+                      if (/^#[0-9a-fA-F]{6}$/.test(v)) update("buttonTextColor", v);
+                    }}
+                    className="flex-1 h-8 text-xs font-mono"
+                  />
+                </div>
               </div>
             </div>
           </div>
