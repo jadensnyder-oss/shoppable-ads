@@ -60,7 +60,6 @@ export default function Home() {
               className="group hover:shadow-md transition-shadow overflow-hidden"
             >
               <CardContent className="p-0">
-                <div className="h-2" style={{ backgroundColor: "#024ddf" }} />
                 <div className="p-5">
                   <div className="flex items-center gap-3 mb-4">
                     <div
@@ -108,13 +107,6 @@ export default function Home() {
                 className="group hover:shadow-md transition-shadow overflow-hidden"
               >
                 <CardContent className="p-0">
-                  <div
-                    className="h-2"
-                    style={{
-                      backgroundColor: config.partner.primaryColor,
-                    }}
-                  />
-
                   <div className="p-5 relative">
                     <Button
                       variant="ghost"
@@ -155,31 +147,6 @@ export default function Home() {
                             {config.advertiser.brandName}
                           </p>
                         )}
-                      </div>
-                    </div>
-
-                    <div className="flex gap-1.5 mb-4">
-                      {[
-                        config.partner.primaryColor,
-                        config.partner.secondaryColor,
-                        config.partner.buttonBgColor,
-                      ].map((color, i) => (
-                        <div
-                          key={i}
-                          className="w-6 h-6 rounded-full border"
-                          style={{ backgroundColor: color }}
-                          title={color}
-                        />
-                      ))}
-                      <div className="flex items-center ml-1">
-                        <span
-                          className="text-xs text-muted-foreground"
-                          style={{
-                            fontFamily: `'${config.partner.fontFamily}', sans-serif`,
-                          }}
-                        >
-                          {config.partner.fontFamily}
-                        </span>
                       </div>
                     </div>
 
