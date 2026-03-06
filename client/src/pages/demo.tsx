@@ -9,6 +9,7 @@ import { ProductBlock } from "@/components/placement/product-block";
 import { BottomSheet } from "@/components/placement/bottom-sheet";
 import { PartnerFrame } from "@/components/demo/partner-frame";
 import { LoadingScreen } from "@/components/demo/loading-screen";
+import { PostConfirmationScreen } from "@/components/demo/post-confirmation-screen";
 import type { PartnerConfig } from "@shared/schema";
 import { apiFetch, useCustomFonts } from "@/lib/utils";
 
@@ -20,9 +21,9 @@ type DemoStep =
   | "confirmation";
 
 const stepTransition = {
-  initial: { opacity: 0, x: 50 },
-  animate: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: -50 },
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
   transition: { duration: 0.3 },
 };
 
@@ -231,14 +232,11 @@ export default function Demo() {
               className="absolute inset-0"
               {...stepTransition}
             >
-              <LoadingScreen
-                message={
-                  addedToOrder
-                    ? "Thank you for your added purchase — taking you to your confirmation page"
-                    : "Taking you to your confirmation page..."
-                }
+              <PostConfirmationScreen
                 primaryColor={config.partner.primaryColor}
-                duration={2200}
+                partnerName={config.partner.name}
+                advertiserName={config.advertiser.brandName}
+                addedToOrder={addedToOrder}
                 onComplete={handleConfirmLoadingComplete}
               />
             </motion.div>
