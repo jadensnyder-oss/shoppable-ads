@@ -12,7 +12,7 @@ export function PlacementHeader({ config }: HeaderProps) {
 
   return (
     <div
-      className="flex flex-col gap-[4px] h-[56px] items-center justify-center pb-px relative w-full"
+      className="flex flex-col gap-[4px] h-[56px] items-center justify-center pt-[8px] pb-[4px] relative w-full"
       style={{ backgroundColor: bgColor }}
     >
       <div
@@ -24,7 +24,7 @@ export function PlacementHeader({ config }: HeaderProps) {
         <img
           src={partner.logo}
           alt={partner.name}
-          className="h-[24px] max-w-[140px] w-auto object-contain shrink-0"
+          className="h-[18px] max-w-[110px] w-auto object-contain shrink-0"
         />
       ) : (
         <span

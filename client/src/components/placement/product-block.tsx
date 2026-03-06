@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Clock, ChevronLeft, ChevronRight, Truck } from "lucide-react";
+import { Gift, ChevronLeft, ChevronRight, Truck } from "lucide-react";
 import type { PartnerConfig } from "@shared/schema";
 
 const DESIGN_WIDTH = 393;
@@ -35,7 +35,7 @@ function Countdown({
   return (
     <div className="bg-[#fafafa] flex gap-[12px] items-center px-[16px] py-[14px] relative rounded-[8px] w-full">
       <div className="absolute border border-[#cacaca] border-solid inset-[-0.5px] pointer-events-none rounded-[8.5px]" />
-      <Clock className="w-5 h-5 shrink-0" style={{ color: primaryColor }} />
+      <Gift className="w-6 h-6 shrink-0" style={{ color: primaryColor }} />
       <div className="flex-1 text-center">
         <p style={{ fontSize: scale(16), color: primaryColor }}>
           <span
@@ -64,7 +64,7 @@ function Countdown({
   );
 }
 
-function ImageCarousel({ images }: { images: string[] }) {
+function ImageCarousel({ images, primaryColor }: { images: string[]; primaryColor: string }) {
   const [current, setCurrent] = useState(0);
   const displayImages = images.length > 0 ? images : [];
 
@@ -87,27 +87,46 @@ function ImageCarousel({ images }: { images: string[] }) {
   }
 
   return (
-    <div className="w-full aspect-square rounded-[16px] overflow-hidden relative">
-      <img
-        src={displayImages[current]}
-        alt="Product"
-        className="w-full h-full object-cover"
-      />
-      {current > 0 && (
-        <button
-          onClick={prev}
-          className="absolute left-[8px] top-1/2 -translate-y-1/2 w-[32px] h-[32px] rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center cursor-pointer transition-colors"
-        >
-          <ChevronLeft className="w-5 h-5 text-white" />
-        </button>
-      )}
-      {current < displayImages.length - 1 && (
-        <button
-          onClick={next}
-          className="absolute right-[8px] top-1/2 -translate-y-1/2 w-[32px] h-[32px] rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center cursor-pointer transition-colors"
-        >
-          <ChevronRight className="w-5 h-5 text-white" />
-        </button>
+    <div className="flex flex-col gap-[12px] w-full">
+      <div className="w-full aspect-square rounded-[16px] overflow-hidden relative">
+        <img
+          src={displayImages[current]}
+          alt="Product"
+          className="w-full h-full object-cover"
+        />
+        {current > 0 && (
+          <button
+            onClick={prev}
+            className="absolute left-[8px] top-1/2 -translate-y-1/2 w-[32px] h-[32px] rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center cursor-pointer transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5 text-white" />
+          </button>
+        )}
+        {current < displayImages.length - 1 && (
+          <button
+            onClick={next}
+            className="absolute right-[8px] top-1/2 -translate-y-1/2 w-[32px] h-[32px] rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center cursor-pointer transition-colors"
+          >
+            <ChevronRight className="w-5 h-5 text-white" />
+          </button>
+        )}
+      </div>
+      {displayImages.length > 1 && (
+        <div className="flex gap-[8px] items-center justify-center">
+          {displayImages.map((img, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              className="w-[48px] h-[48px] rounded-[8px] overflow-hidden cursor-pointer transition-opacity shrink-0"
+              style={{
+                border: i === current ? `2px solid ${primaryColor}` : "1px solid #e0e0e0",
+                opacity: i === current ? 1 : 0.7,
+              }}
+            >
+              <img src={img} alt={`Product ${i + 1}`} className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );
@@ -144,7 +163,7 @@ export function ProductBlock({
 
       {/* Image carousel + Product details */}
       <div className="flex flex-col gap-[24px] items-start w-full">
-        <ImageCarousel images={advertiser.productImages} />
+        <ImageCarousel images={advertiser.productImages} primaryColor={primaryColor} />
 
         <div className="flex flex-col gap-[24px] items-start w-full">
           {/* Badges + Brand + Title */}
