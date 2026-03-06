@@ -65,6 +65,7 @@ interface FormState {
   variants: { label: string; options: string[] }[];
   soldBy: string;
   customFonts: { name: string; url: string }[];
+  logoColor: string;
 }
 
 const defaultForm: FormState = {
@@ -101,6 +102,7 @@ const defaultForm: FormState = {
   variants: [],
   soldBy: "",
   customFonts: [],
+  logoColor: "#1a1a1a",
 };
 
 function formToConfig(form: FormState): PartnerConfig {
@@ -264,6 +266,21 @@ export default function Setup() {
 
   const logoInputRef = useRef<HTMLInputElement>(null);
   const [logoUploading, setLogoUploading] = useState(false);
+  const [svgContent, setSvgContent] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!form.logo || !form.logo.endsWith(".svg")) {
+      setSvgContent(null);
+      return;
+    }
+    fetch(form.logo)
+      .then((res) => res.text())
+      .then((text) => {
+        if (text.includes("<svg")) setSvgContent(text);
+        else setSvgContent(null);
+      })
+      .catch(() => setSvgContent(null));
+  }, [form.logo]);
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -394,26 +411,38 @@ export default function Setup() {
           <div className="flex flex-col gap-8">
             <div>
               <h2 className="text-lg font-semibold mb-1">Upload Partner Pages</h2>
-              <p className="text-sm text-muted-foreground">
-                Upload SingleFile HTML captures of the partner&apos;s checkout and
-                confirmation pages. Styles will be automatically extracted.
-              </p>
             </div>
 
             {/* Partner info + Logo */}
-            <div className="flex gap-6 items-start">
-              <div className="flex flex-col items-center gap-2">
-                <Label className="text-xs">Logo (SVG preferred)</Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex flex-col items-center gap-3">
+                <Label className="text-xs self-start">Logo (SVG preferred)</Label>
                 {form.logo ? (
-                  <div className="relative w-20 h-20 rounded-lg border overflow-hidden bg-white flex items-center justify-center">
-                    <img
-                      src={form.logo}
-                      alt="Partner logo"
-                      className="max-w-full max-h-full object-contain p-1"
-                    />
+                  <div className="relative w-[120px] h-[120px] rounded-xl border bg-white flex items-center justify-center overflow-hidden">
+                    {svgContent ? (
+                      <div
+                        className="w-full h-full p-3 flex items-center justify-center [&_svg]:w-full [&_svg]:h-full [&_svg]:object-contain"
+                        style={{ color: form.logoColor }}
+                        dangerouslySetInnerHTML={{
+                          __html: svgContent.replace(
+                            /fill="[^"]*"/g,
+                            'fill="currentColor"'
+                          ),
+                        }}
+                      />
+                    ) : (
+                      <img
+                        src={form.logo}
+                        alt="Partner logo"
+                        className="max-w-full max-h-full object-contain p-3"
+                      />
+                    )}
                     <button
-                      onClick={() => setForm((prev) => ({ ...prev, logo: "" }))}
-                      className="absolute top-1 right-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center cursor-pointer"
+                      onClick={() => {
+                        setForm((prev) => ({ ...prev, logo: "" }));
+                        setSvgContent(null);
+                      }}
+                      className="absolute top-1.5 right-1.5 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center cursor-pointer"
                     >
                       <X className="w-3 h-3 text-white" />
                     </button>
@@ -422,17 +451,30 @@ export default function Setup() {
                   <button
                     onClick={() => logoInputRef.current?.click()}
                     disabled={logoUploading}
-                    className="w-20 h-20 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-muted-foreground hover:border-primary/50 transition-colors cursor-pointer"
+                    className="w-[120px] h-[120px] border-2 border-dashed rounded-xl flex flex-col items-center justify-center text-muted-foreground hover:border-primary/50 transition-colors cursor-pointer"
                   >
                     {logoUploading ? (
                       <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                     ) : (
                       <>
                         <Upload className="w-5 h-5" />
-                        <span className="text-[10px] mt-1">Upload</span>
+                        <span className="text-xs mt-1">Upload</span>
                       </>
                     )}
                   </button>
+                )}
+                {svgContent && (
+                  <div className="flex items-center gap-2">
+                    <Label className="text-xs">Logo Color</Label>
+                    <input
+                      type="color"
+                      value={form.logoColor}
+                      onChange={(e) =>
+                        setForm((prev) => ({ ...prev, logoColor: e.target.value }))
+                      }
+                      className="w-7 h-7 rounded border cursor-pointer"
+                    />
+                  </div>
                 )}
                 <input
                   ref={logoInputRef}
@@ -444,37 +486,23 @@ export default function Setup() {
               </div>
 
               {!isEditing ? (
-                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-1.5">
-                    <Label>Partner Name</Label>
-                    <Input
-                      value={form.name}
-                      onChange={(e) =>
-                        setForm((prev) => ({
-                          ...prev,
-                          name: e.target.value,
-                          partnerId: prev.partnerId || e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
-                        }))
-                      }
-                      placeholder="e.g. Ticketmaster"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <Label>Partner ID (slug)</Label>
-                    <Input
-                      value={form.partnerId}
-                      onChange={(e) =>
-                        setForm((prev) => ({
-                          ...prev,
-                          partnerId: e.target.value,
-                        }))
-                      }
-                      placeholder="e.g. ticketmaster"
-                    />
-                  </div>
+                <div className="flex flex-col gap-1.5 justify-center">
+                  <Label>Partner Name</Label>
+                  <Input
+                    value={form.name}
+                    onChange={(e) => {
+                      const name = e.target.value;
+                      setForm((prev) => ({
+                        ...prev,
+                        name,
+                        partnerId: name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
+                      }));
+                    }}
+                    placeholder="e.g. Ticketmaster"
+                  />
                 </div>
               ) : (
-                <div className="flex-1 flex items-center">
+                <div className="flex items-center">
                   <p className="text-sm text-muted-foreground">
                     Editing <strong>{form.name}</strong>
                   </p>
