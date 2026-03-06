@@ -18,7 +18,7 @@ export function PostConfirmationScreen({
   advertiserName,
   addedToOrder = false,
   loadingDuration = 3000,
-  countdownFrom = 5,
+  countdownFrom = 3,
   onComplete,
 }: PostConfirmationScreenProps) {
   const [phase, setPhase] = useState<"loading" | "success">("loading");
@@ -82,13 +82,13 @@ export function PostConfirmationScreen({
 
   return (
     <motion.div
-      className="flex min-h-screen flex-col items-center justify-center bg-white px-8"
+      className="flex min-h-screen flex-col items-center bg-white px-8"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="flex w-full max-w-[320px] flex-col items-center gap-10 text-center">
+      <div className="flex w-full max-w-[320px] flex-col items-center text-center" style={{ marginTop: "38vh" }}>
         <div className="relative flex h-24 w-24 items-center justify-center">
           <AnimatePresence mode="wait">
             {phase === "loading" ? (
@@ -136,7 +136,7 @@ export function PostConfirmationScreen({
         <AnimatePresence>
           {showCopy && (
             <motion.div
-              className="flex w-full flex-col items-center gap-3"
+              className="flex w-full flex-col items-center gap-3 mt-10"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
@@ -158,7 +158,8 @@ export function PostConfirmationScreen({
                 className="text-[14px] leading-[1.45] text-[#646464]"
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
-                {`Redirecting you in ${secondsRemaining}...`}
+                Redirecting you in{" "}
+                <span style={{ fontWeight: 600 }}>{secondsRemaining}</span>...
               </p>
             </motion.div>
           )}
