@@ -136,8 +136,6 @@ function buildIframeHtml(
     </script>
   `;
 
-  const staticHeader = buildStaticHeader(header);
-
   let processed = html;
   if (processed.includes("</head>")) {
     processed = processed.replace("</head>", fontFaceCSS + responsiveCSS + viewportFix + "</head>");
@@ -145,12 +143,16 @@ function buildIframeHtml(
     processed = fontFaceCSS + responsiveCSS + viewportFix + processed;
   }
 
-  if (processed.includes("<body")) {
-    processed = processed.replace(/(<body[^>]*>)/i, "$1" + staticHeader);
-  } else if (processed.includes("</head>")) {
-    processed = processed.replace("</head>", "</head>" + staticHeader);
-  } else {
-    processed = staticHeader + processed;
+  const htmlHasOwnHeader = /class="header"|class='header'|id="site-header"|id="rokt-custom-header"/.test(html);
+  if (!htmlHasOwnHeader) {
+    const staticHeader = buildStaticHeader(header);
+    if (processed.includes("<body")) {
+      processed = processed.replace(/(<body[^>]*>)/i, "$1" + staticHeader);
+    } else if (processed.includes("</head>")) {
+      processed = processed.replace("</head>", "</head>" + staticHeader);
+    } else {
+      processed = staticHeader + processed;
+    }
   }
 
   if (processed.includes("</body>")) {
