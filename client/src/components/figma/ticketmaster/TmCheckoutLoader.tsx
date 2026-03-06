@@ -9,7 +9,7 @@ interface TmCheckoutLoaderProps {
 
 const TM_BLUE = "#024ddf";
 
-function AnimatedSpinner() {
+export function AnimatedSpinner() {
   return (
     <motion.svg
       width="92"
@@ -43,27 +43,18 @@ function AnimatedSpinner() {
 
 function TicketCheckIcon() {
   return (
-    <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-      {/* Rotated ticket body */}
-      <g transform="translate(60,52) rotate(45)">
-        <path
-          d="M-28,-28 L28,-28 L28,-8 C22,-8 18,-4 18,2 C18,8 22,12 28,12 L28,28 L-28,28 L-28,12 C-22,12 -18,8 -18,2 C-18,-4 -22,-8 -28,-8 Z"
-          fill={TM_BLUE}
-        />
-        {/* Ticket detail lines */}
-        <line x1="-12" y1="-12" x2="12" y2="-12" stroke="white" strokeWidth="3" strokeLinecap="round" opacity="0.5" />
-        <line x1="-8" y1="-4" x2="8" y2="-4" stroke="white" strokeWidth="3" strokeLinecap="round" opacity="0.5" />
-        <line x1="-12" y1="4" x2="12" y2="4" stroke="white" strokeWidth="3" strokeLinecap="round" opacity="0.5" />
-      </g>
-      {/* Check badge circle */}
-      <circle cx="76" cy="76" r="18" fill="#1a1a1a" />
+    <svg width="92" height="92" viewBox="0 0 92 92" fill="none">
       <path
-        d="M68 76L74 82L85 71"
-        stroke="white"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M37.5949 56.3482L56.3463 37.5986L59.7301 40.9823L40.9786 59.7319L37.5949 56.3482ZM32.2699 51.0214L51.0195 32.2699L54.4033 35.6537L35.6537 54.4051L32.2699 51.0214ZM51.0195 25.1638L25.162 51.0214L40.9805 66.838L45.7534 62.065C46.4729 58.0281 48.4104 54.2929 51.3599 51.347C54.3039 48.4086 58.0336 46.4747 62.0632 45.7553L66.838 40.9823L51.0195 25.1638ZM62.0687 68.1076L70.4775 57.9306L74.4059 61.1818L62.7974 75.2284L56.4328 70.1114L59.6252 66.1425L62.0687 68.1076ZM53.5256 53.5348C46.8777 60.1827 46.8924 71.0553 53.5366 77.6977C60.1754 84.3382 71.0626 84.3401 77.7014 77.6977C84.3382 71.0608 84.3474 60.1588 77.6977 53.5293C71.0516 46.8906 60.1606 46.8777 53.5256 53.5348ZM53.912 0L0 53.9138L16.1147 70.0267L17.9179 68.2235C19.5298 66.6135 22.1646 66.6117 23.7765 68.2217C25.3883 69.8335 25.3883 72.4702 23.7765 74.0821L21.9733 75.8853L38.0862 92L50.795 79.2893C48.1013 76.3692 46.3404 72.7573 45.7056 68.8786L40.9805 73.6037L18.3945 51.0214L51.0177 18.3982L73.6037 40.9805L68.8786 45.7074C72.7573 46.3422 76.371 48.1013 79.2893 50.7987L92 38.088L75.8853 21.9751L74.0821 23.7783C72.4721 25.3902 69.8354 25.3902 68.2217 23.7783C66.6098 22.1665 66.6098 19.5298 68.2217 17.9198L70.0249 16.1166L53.912 0Z"
+        fill="#024DDF"
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M62.0222 68.1076L70.431 57.9306L74.3594 61.1818L62.7508 75.2284L56.3862 70.1114L59.5786 66.1425L62.0222 68.1076ZM53.479 53.5348C46.8311 60.1827 46.8458 71.0553 53.4901 77.6977C60.1288 84.3382 71.0161 84.3401 77.6548 77.6977C84.2917 71.0608 84.3009 60.1588 77.6511 53.5293C71.005 46.8906 60.1141 46.8777 53.479 53.5348Z"
+        fill="#121212"
       />
     </svg>
   );
@@ -138,7 +129,7 @@ export default function TmCheckoutLoader({
                 className="text-[16px] leading-[1.45] text-[#696863]"
                 style={{ fontFamily: "'Averta', 'Inter', sans-serif" }}
               >
-                Wrapping up your confirmation and a quick bonus...
+                Preparing a special offer for you...
               </p>
             </motion.div>
           )}

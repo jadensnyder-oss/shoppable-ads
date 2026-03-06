@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check } from "lucide-react";
 
@@ -9,6 +9,7 @@ interface PostConfirmationScreenProps {
   addedToOrder?: boolean;
   loadingDuration?: number;
   countdownFrom?: number;
+  customSpinner?: ReactNode;
   onComplete: () => void;
 }
 
@@ -19,6 +20,7 @@ export function PostConfirmationScreen({
   addedToOrder = false,
   loadingDuration = 3000,
   countdownFrom = 3,
+  customSpinner,
   onComplete,
 }: PostConfirmationScreenProps) {
   const [phase, setPhase] = useState<"loading" | "success">("loading");
@@ -100,12 +102,14 @@ export function PostConfirmationScreen({
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }}
               >
-                <motion.div
-                  className="h-20 w-20 rounded-full border-[6px] border-[#d8deea]"
-                  style={{ borderTopColor: primaryColor }}
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
-                />
+                {customSpinner ?? (
+                  <motion.div
+                    className="h-20 w-20 rounded-full border-[6px] border-[#d8deea]"
+                    style={{ borderTopColor: primaryColor }}
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
+                  />
+                )}
               </motion.div>
             ) : (
               <motion.div

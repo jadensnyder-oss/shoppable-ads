@@ -8,7 +8,7 @@ import CheckoutView from "@/components/figma/ticketmaster/CheckoutView";
 import InterstitialView from "@/components/figma/ticketmaster/InterstitialView";
 import PaymentSheet from "@/components/figma/ticketmaster/PaymentSheet";
 import TicketmasterConfirmation from "@/components/figma/ticketmaster/TicketmasterConfirmation";
-import TmCheckoutLoader from "@/components/figma/ticketmaster/TmCheckoutLoader";
+import TmCheckoutLoader, { AnimatedSpinner as TmSpinner } from "@/components/figma/ticketmaster/TmCheckoutLoader";
 import "@/components/figma/ticketmaster/fonts.css";
 
 type DemoStep =
@@ -162,6 +162,7 @@ export default function TicketmasterDemo() {
                 partnerName="Ticketmaster"
                 advertiserName="Dagne Dover"
                 addedToOrder
+                customSpinner={<TmSpinner />}
                 onComplete={handleConfirmLoadingComplete}
               />
             </motion.div>
