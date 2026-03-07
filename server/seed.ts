@@ -32,8 +32,15 @@ const stockxPartner: InsertPartner = {
   buttonBorderRadius: "100px",
   buttonBorder: "none",
 
+  secondaryButtonBgColor: "transparent",
+  secondaryButtonTextColor: "#000000",
+  secondaryButtonBorder: "1px solid #0f0f0f",
+  logoColor: null,
   headerBgColor: "#ffffff",
   headerBgImage: null,
+  headerLogoHeight: "18px",
+  headerAlignment: "center",
+  headerSubtextColor: null,
 
   checkoutHtml: readHtmlFile("client/public/partners/stockx/checkout.html"),
   confirmationHtml: readHtmlFile("client/public/partners/stockx/confirmation.html"),
@@ -55,9 +62,10 @@ const stockxPartner: InsertPartner = {
   productDescription:
     "One size, fits all.\n• Dip-dye clay effect\n• 85% Cotton + 13% Polyamide + 2% Elastane\n• Embroidery on leg\n• Screenprint on foot\n• Made in Portugal",
   ctaButtonText: "Add to order",
+  declineButtonText: "Decline offer",
   countdownSeconds: 300,
   badges: ["EXCLUSIVE OFFER", "Free Shipping"],
-  variants: [{ label: "Select color", options: ["Burnt Clay", "Ocean Blue", "Forest Green"] }],
+  variants: [{ label: "Select color", options: ["Burnt Clay", "Ocean Blue", "Forest Green"], type: "dropdown" as const }],
   soldBy: "Palmes",
   customFonts: [],
 };

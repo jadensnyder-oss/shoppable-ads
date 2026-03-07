@@ -12,18 +12,23 @@ interface PartnerFrameProps {
 interface HeaderConfig {
   logoUrl: string | null;
   bgColor: string;
+  logoHeight?: string;
+  alignment?: "center" | "left";
 }
 
 function buildStaticHeader(cfg: HeaderConfig): string {
+  const h = cfg.logoHeight || "32px";
   const logo = cfg.logoUrl
-    ? `<img src="${cfg.logoUrl}" alt="Partner" style="max-height:32px;max-width:160px;width:auto;display:block;object-fit:contain;" />`
+    ? `<img src="${cfg.logoUrl}" alt="Partner" style="max-height:${h};max-width:160px;width:auto;display:block;object-fit:contain;" />`
     : "";
+
+  const justify = cfg.alignment === "left" ? "flex-start" : "center";
 
   return `
     <div id="rokt-static-header" style="
       display:flex;
       align-items:center;
-      justify-content:center;
+      justify-content:${justify};
       padding:12px 16px;
       background-color:${cfg.bgColor};
       border-bottom:1px solid rgba(0,0,0,0.08);
@@ -209,7 +214,12 @@ export function PartnerFrame({
   const srcDoc = buildIframeHtml(
     html,
     pageType,
-    { logoUrl: config.partner.logo, bgColor: config.partner.headerBgColor },
+    {
+      logoUrl: config.partner.logo,
+      bgColor: config.partner.headerBgColor,
+      logoHeight: config.partner.headerLogoHeight,
+      alignment: config.partner.headerAlignment,
+    },
     config.partner.customFonts
   );
 

@@ -24,6 +24,9 @@ export const partnerSchema = z.object({
   logoColor: z.string().nullable().default(null),
   headerBgColor: z.string().default("#ffffff"),
   headerBgImage: z.string().nullable().default(null),
+  headerLogoHeight: z.string().default("18px"),
+  headerAlignment: z.enum(["center", "left"]).default("center"),
+  headerSubtextColor: z.string().nullable().default(null),
 
   checkoutHtml: z.string().nullable().default(null),
   confirmationHtml: z.string().nullable().default(null),
@@ -39,10 +42,11 @@ export const partnerSchema = z.object({
   productDiscount: z.string().nullable().default(null),
   productDescription: z.string().nullable().default(null),
   ctaButtonText: z.string().default("Add to order"),
+  declineButtonText: z.string().default("Decline offer"),
   countdownSeconds: z.number().default(300),
   badges: z.array(z.string()).default([]),
   variants: z
-    .array(z.object({ label: z.string(), options: z.array(z.string()) }))
+    .array(z.object({ label: z.string(), options: z.array(z.string()), type: z.enum(["dropdown", "color"]).default("dropdown") }))
     .default([]),
   soldBy: z.string().nullable().default(null),
   customFonts: z
@@ -85,6 +89,9 @@ export interface PartnerConfig {
     logoColor: string | null;
     headerBgColor: string;
     headerBgImage: string | null;
+    headerLogoHeight: string;
+    headerAlignment: "center" | "left";
+    headerSubtextColor: string | null;
     checkoutHtml: string | null;
     confirmationHtml: string | null;
     confirmationText: string;
@@ -101,9 +108,10 @@ export interface PartnerConfig {
     productDiscount: string | null;
     productDescription: string | null;
     ctaButtonText: string;
+    declineButtonText: string;
     countdownSeconds: number;
     badges: string[];
-    variants: { label: string; options: string[] }[];
+    variants: { label: string; options: string[]; type?: "dropdown" | "color" }[];
     soldBy: string | null;
   };
 }
@@ -131,6 +139,9 @@ export function partnerToConfig(p: Partner): PartnerConfig {
       logoColor: p.logoColor,
       headerBgColor: p.headerBgColor,
       headerBgImage: p.headerBgImage,
+      headerLogoHeight: p.headerLogoHeight,
+      headerAlignment: p.headerAlignment,
+      headerSubtextColor: p.headerSubtextColor,
       checkoutHtml: p.checkoutHtml,
       confirmationHtml: p.confirmationHtml,
       confirmationText: p.confirmationText,
@@ -147,6 +158,7 @@ export function partnerToConfig(p: Partner): PartnerConfig {
       productDiscount: p.productDiscount,
       productDescription: p.productDescription,
       ctaButtonText: p.ctaButtonText,
+      declineButtonText: p.declineButtonText,
       countdownSeconds: p.countdownSeconds,
       badges: p.badges,
       variants: p.variants,

@@ -67,34 +67,7 @@ const ROKT_SELECTORS = [
 export function cleanHtml(html: string): string {
   const $ = cheerio.load(html);
 
-  for (const sel of HEADER_SELECTORS) {
-    $(sel).remove();
-  }
-
-  for (const sel of FOOTER_SELECTORS) {
-    $(sel).remove();
-  }
-
-  for (const sel of ROKT_SELECTORS) {
-    $(sel).remove();
-  }
-
-  $("*").each((_i, el) => {
-    if (el instanceof DomElement) {
-      const tag = el.tagName.toLowerCase();
-      if (tag.startsWith("rokt-")) {
-        $(el).remove();
-        return;
-      }
-      const allAttrs = el.attribs || {};
-      const attrString = Object.keys(allAttrs).join(" ") + " " + Object.values(allAttrs).join(" ");
-      if (/rokt/i.test(attrString)) {
-        $(el).remove();
-      }
-    }
-  });
-
-  // Remove tracking pixels: 1x1 images and hidden iframes
+  // Only remove tracking pixels: 1x1 images and hidden iframes
   $("img").each((_i, el) => {
     const $el = $(el);
     const w = $el.attr("width");

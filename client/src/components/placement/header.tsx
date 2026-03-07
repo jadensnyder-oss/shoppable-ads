@@ -10,6 +10,9 @@ export function PlacementHeader({ config }: HeaderProps) {
   const { partner, advertiser } = config;
   const bgColor = partner.headerBgColor || "#ffffff";
   const dark = isColorDark(bgColor);
+  const logoHeight = partner.headerLogoHeight || "18px";
+  const alignment = partner.headerAlignment || "center";
+  const subtextColor = partner.headerSubtextColor || (dark ? "rgba(255,255,255,0.6)" : "#c4c4c4");
   const [svgContent, setSvgContent] = useState<string | null>(null);
   const isSvg = partner.logo?.toLowerCase().endsWith(".svg");
 
@@ -29,20 +32,31 @@ export function PlacementHeader({ config }: HeaderProps) {
 
   return (
     <div
-      className="flex flex-col gap-[4px] h-[56px] items-center justify-center pt-[8px] pb-[4px] relative w-full"
-      style={{ backgroundColor: bgColor }}
+      className="flex flex-col gap-[4px] h-[56px] pt-[8px] pb-[4px] relative w-full"
+      style={{
+        backgroundColor: bgColor,
+        alignItems: alignment === "left" ? "flex-start" : "center",
+        justifyContent: "center",
+        paddingLeft: alignment === "left" ? "16px" : undefined,
+        paddingRight: alignment === "left" ? "16px" : undefined,
+      }}
     >
       <div
         className="absolute inset-0 pointer-events-none"
         style={{ borderBottom: dark ? "none" : "1px solid #c4c4c4" }}
       />
 
-      <div className="flex flex-col items-center gap-[4px]">
+      <div className="flex flex-col gap-[4px]" style={{ alignItems: alignment === "left" ? "flex-start" : "center" }}>
         {partner.logo ? (
           isSvg && svgContent && partner.logoColor ? (
             <div
-              className="h-[18px] w-[75%] flex items-center justify-center [&_svg]:h-full [&_svg]:w-auto [&_svg]:object-contain"
-              style={{ color: partner.logoColor }}
+              className="w-[75%] flex [&_svg]:h-full [&_svg]:w-auto [&_svg]:object-contain"
+              style={{
+                color: partner.logoColor,
+                height: logoHeight,
+                justifyContent: alignment === "left" ? "flex-start" : "center",
+                alignItems: "center",
+              }}
               dangerouslySetInnerHTML={{
                 __html: svgContent.replace(
                   /fill="[^"]*"/g,
@@ -54,7 +68,8 @@ export function PlacementHeader({ config }: HeaderProps) {
             <img
               src={partner.logo}
               alt={partner.name}
-              className="h-[18px] w-[75%] object-contain shrink-0"
+              className="w-[75%] object-contain shrink-0"
+              style={{ height: logoHeight }}
             />
           )
         ) : (
@@ -74,7 +89,7 @@ export function PlacementHeader({ config }: HeaderProps) {
             className="font-normal leading-[16px] text-[12px] whitespace-nowrap shrink-0"
             style={{
               fontFamily: "'Inter', sans-serif",
-              color: dark ? "rgba(255,255,255,0.6)" : "#c4c4c4",
+              color: subtextColor,
             }}
           >
             In partnership with {advertiser.brandName}

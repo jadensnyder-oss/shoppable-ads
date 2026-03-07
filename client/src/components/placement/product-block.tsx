@@ -135,6 +135,46 @@ function ImageCarousel({ images, primaryColor, borderRadius }: { images: string[
   );
 }
 
+function ColorSwatchVariant({
+  variant,
+  primaryColor,
+  borderRadius,
+}: {
+  variant: { label: string; options: string[]; type?: string };
+  primaryColor: string;
+  borderRadius: string;
+}) {
+  const [selected, setSelected] = useState(0);
+
+  return (
+    <div className="flex flex-col gap-[8px] w-full">
+      <div className="flex items-center gap-[6px]">
+        <span style={{ fontSize: scale(14), fontFamily: "'Inter', sans-serif", color: "#242424" }}>
+          {variant.label}:
+        </span>
+        <span className="font-semibold" style={{ fontSize: scale(14), fontFamily: "'Inter', sans-serif", color: "#242424" }}>
+          {variant.options[selected] || ""}
+        </span>
+      </div>
+      <div className="flex gap-[8px] items-center flex-wrap">
+        {variant.options.map((color, i) => (
+          <button
+            key={`${color}-${i}`}
+            onClick={() => setSelected(i)}
+            className="w-[36px] h-[36px] rounded-full cursor-pointer transition-all shrink-0"
+            style={{
+              backgroundColor: color,
+              border: i === selected ? `2px solid ${primaryColor}` : "2px solid #e0e0e0",
+              boxShadow: i === selected ? `0 0 0 2px white, 0 0 0 4px ${primaryColor}` : "none",
+            }}
+            title={color}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function ProductBlock({
   config,
   onAddToOrder,
@@ -309,22 +349,30 @@ export function ProductBlock({
 
           {/* Variant selector */}
           {advertiser.variants.length > 0 && (
-            <div className="flex flex-col gap-[8px] items-start w-full">
+            <div className="flex flex-col gap-[12px] items-start w-full">
               {advertiser.variants.map((variant) => (
                 <div key={variant.label} className="w-full">
-                  <div className="bg-white h-[44px] border border-[#cacaca] flex items-center justify-between px-[12px] w-full" style={{ borderRadius: partner.borderRadius || "8px" }}>
-                    <div className="flex items-center gap-[6px]">
-                      <span style={{ fontSize: scale(14), fontFamily: "'Inter', sans-serif", color: "#242424" }}>
-                        {variant.label}:
-                      </span>
-                      <span className="font-semibold" style={{ fontSize: scale(14), fontFamily: "'Inter', sans-serif", color: "#242424" }}>
-                        {variant.options[0]}
-                      </span>
+                  {variant.type === "color" ? (
+                    <ColorSwatchVariant
+                      variant={variant}
+                      primaryColor={primaryColor}
+                      borderRadius={partner.borderRadius || "8px"}
+                    />
+                  ) : (
+                    <div className="bg-white h-[44px] border border-[#cacaca] flex items-center justify-between px-[12px] w-full" style={{ borderRadius: partner.borderRadius || "8px" }}>
+                      <div className="flex items-center gap-[6px]">
+                        <span style={{ fontSize: scale(14), fontFamily: "'Inter', sans-serif", color: "#242424" }}>
+                          {variant.label}:
+                        </span>
+                        <span className="font-semibold" style={{ fontSize: scale(14), fontFamily: "'Inter', sans-serif", color: "#242424" }}>
+                          {variant.options[0]}
+                        </span>
+                      </div>
+                      <svg width="16" height="16" viewBox="0 0 12 7" fill="none">
+                        <path d="M0.833 0.833L5.833 5.833L10.833 0.833" stroke="black" strokeWidth="1.667" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
                     </div>
-                    <svg width="16" height="16" viewBox="0 0 12 7" fill="none">
-                      <path d="M0.833 0.833L5.833 5.833L10.833 0.833" stroke="black" strokeWidth="1.667" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -404,7 +452,7 @@ export function ProductBlock({
               color: partner.secondaryButtonTextColor || "#000000",
             }}
           >
-            Decline offer
+            {advertiser.declineButtonText || "Decline offer"}
           </span>
         </button>
       </div>

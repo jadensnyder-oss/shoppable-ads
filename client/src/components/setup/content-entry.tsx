@@ -16,12 +16,47 @@ interface ContentEntryProps {
     productImage: string;
     productImages: string[];
     ctaButtonText: string;
+    declineButtonText: string;
     countdownSeconds: number;
     badges: string[];
     soldBy: string;
-    variants: { label: string; options: string[] }[];
+    variants: { label: string; options: string[]; type?: "dropdown" | "color" }[];
   };
   onChange: (values: ContentEntryProps["values"]) => void;
+}
+
+function VariantOptionInput({ type, onAdd }: { type: "dropdown" | "color"; onAdd: (val: string) => void }) {
+  const [val, setVal] = useState("");
+
+  const handleAdd = () => {
+    const v = val.trim();
+    if (!v) return;
+    onAdd(v);
+    setVal("");
+  };
+
+  return (
+    <div className="flex items-center gap-1">
+      {type === "color" && (
+        <input
+          type="color"
+          value={val.startsWith("#") ? val : "#C25A3C"}
+          onChange={(e) => { setVal(e.target.value); onAdd(e.target.value); }}
+          className="w-7 h-7 rounded border cursor-pointer shrink-0"
+        />
+      )}
+      <Input
+        value={val}
+        onChange={(e) => setVal(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+        placeholder={type === "color" ? "#hex or name" : "Option..."}
+        className="h-7 text-xs w-24"
+      />
+      <Button variant="ghost" size="sm" onClick={handleAdd} className="h-7 px-1.5">
+        <Plus className="w-3 h-3" />
+      </Button>
+    </div>
+  );
 }
 
 export function ContentEntry({ values, onChange }: ContentEntryProps) {
@@ -178,15 +213,29 @@ export function ContentEntry({ values, onChange }: ContentEntryProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1.5">
-          <Label>CTA Button Text</Label>
-          <Input
-            value={values.ctaButtonText}
-            onChange={(e) => update("ctaButtonText", e.target.value)}
-            placeholder="Add to order"
-          />
+      <div className="border rounded-lg p-4">
+        <h4 className="text-sm font-semibold mb-3">CTA Buttons</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-xs">Primary Button Text</Label>
+            <Input
+              value={values.ctaButtonText}
+              onChange={(e) => update("ctaButtonText", e.target.value)}
+              placeholder="Add to order"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-xs">Secondary Button Text</Label>
+            <Input
+              value={values.declineButtonText}
+              onChange={(e) => update("declineButtonText", e.target.value)}
+              placeholder="Decline offer"
+            />
+          </div>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
           <Label>Countdown (seconds)</Label>
           <Input
@@ -226,6 +275,95 @@ export function ContentEntry({ values, onChange }: ContentEntryProps) {
             </Button>
           </div>
         </div>
+      </div>
+
+      {/* Variants */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <Label>Variants</Label>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => update("variants", [...values.variants, { label: "", options: [], type: "dropdown" }])}
+          >
+            <Plus className="w-3 h-3 mr-1" />
+            Add Variant
+          </Button>
+        </div>
+        {values.variants.map((variant, vi) => (
+          <div key={vi} className="border rounded-lg p-3 flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Input
+                value={variant.label}
+                onChange={(e) => {
+                  const newVariants = [...values.variants];
+                  newVariants[vi] = { ...newVariants[vi], label: e.target.value };
+                  update("variants", newVariants);
+                }}
+                placeholder="Label (e.g. Select color)"
+                className="flex-1 h-8 text-sm"
+              />
+              <select
+                value={variant.type || "dropdown"}
+                onChange={(e) => {
+                  const newVariants = [...values.variants];
+                  newVariants[vi] = { ...newVariants[vi], type: e.target.value as "dropdown" | "color" };
+                  update("variants", newVariants);
+                }}
+                className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+              >
+                <option value="dropdown">Dropdown</option>
+                <option value="color">Color Swatches</option>
+              </select>
+              <button
+                onClick={() => update("variants", values.variants.filter((_, i) => i !== vi))}
+                className="text-muted-foreground hover:text-foreground cursor-pointer shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-1.5 items-center">
+              {variant.options.map((opt, oi) => (
+                <span
+                  key={`${opt}-${oi}`}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs bg-muted"
+                >
+                  {variant.type === "color" && (
+                    <span
+                      className="w-3 h-3 rounded-full border border-border shrink-0"
+                      style={{ backgroundColor: opt }}
+                    />
+                  )}
+                  {opt}
+                  <button
+                    onClick={() => {
+                      const newVariants = [...values.variants];
+                      newVariants[vi] = {
+                        ...newVariants[vi],
+                        options: newVariants[vi].options.filter((_, i) => i !== oi),
+                      };
+                      update("variants", newVariants);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <X className="w-2.5 h-2.5" />
+                  </button>
+                </span>
+              ))}
+              <VariantOptionInput
+                type={variant.type || "dropdown"}
+                onAdd={(val) => {
+                  const newVariants = [...values.variants];
+                  newVariants[vi] = {
+                    ...newVariants[vi],
+                    options: [...newVariants[vi].options, val],
+                  };
+                  update("variants", newVariants);
+                }}
+              />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

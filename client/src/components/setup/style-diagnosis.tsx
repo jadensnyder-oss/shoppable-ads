@@ -394,10 +394,10 @@ export function StyleDiagnosis({
         </div>
       )}
 
-      {/* Buttons */}
+      {/* Primary Button */}
       {styles.buttonStyles && (
         <div className="flex flex-col gap-2">
-          <h3 className="text-sm font-semibold">Button Styles</h3>
+          <h3 className="text-sm font-semibold">Primary Button (Add to Order)</h3>
           <div className="p-3 bg-muted/30 rounded-lg">
             <div className="flex items-center gap-4 mb-2">
               <div

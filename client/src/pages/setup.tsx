@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useParams } from "wouter";
-import { ArrowLeft, ArrowRight, Check, Upload, X, Type } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Upload, X, Type, AlignCenter, AlignLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,6 +53,9 @@ interface FormState {
   secondaryButtonBorder: string;
   headerBgColor: string;
   headerBgImage: string;
+  headerLogoHeight: string;
+  headerAlignment: "center" | "left";
+  headerSubtextColor: string;
   confirmationText: string;
   advertiserBrand: string;
   productTitle: string;
@@ -63,9 +66,10 @@ interface FormState {
   productDiscount: string;
   productDescription: string;
   ctaButtonText: string;
+  declineButtonText: string;
   countdownSeconds: number;
   badges: string[];
-  variants: { label: string; options: string[] }[];
+  variants: { label: string; options: string[]; type?: "dropdown" | "color" }[];
   soldBy: string;
   customFonts: { name: string; url: string }[];
   logoColor: string;
@@ -93,6 +97,9 @@ const defaultForm: FormState = {
   secondaryButtonBorder: "1px solid #0f0f0f",
   headerBgColor: "#ffffff",
   headerBgImage: "",
+  headerLogoHeight: "18px",
+  headerAlignment: "center",
+  headerSubtextColor: "",
   confirmationText: "Your order was placed!",
   advertiserBrand: "",
   productTitle: "",
@@ -103,6 +110,7 @@ const defaultForm: FormState = {
   productDiscount: "",
   productDescription: "",
   ctaButtonText: "Add to order",
+  declineButtonText: "Decline offer",
   countdownSeconds: 300,
   badges: [],
   variants: [],
@@ -134,6 +142,9 @@ function formToConfig(form: FormState): PartnerConfig {
       logoColor: form.logoColor || null,
       headerBgColor: form.headerBgColor,
       headerBgImage: form.headerBgImage || null,
+      headerLogoHeight: form.headerLogoHeight,
+      headerAlignment: form.headerAlignment,
+      headerSubtextColor: form.headerSubtextColor || null,
       checkoutHtml: form.checkoutHtml || null,
       confirmationHtml: form.confirmationHtml || null,
       confirmationText: form.confirmationText,
@@ -150,6 +161,7 @@ function formToConfig(form: FormState): PartnerConfig {
       productDiscount: form.productDiscount || null,
       productDescription: form.productDescription || null,
       ctaButtonText: form.ctaButtonText,
+      declineButtonText: form.declineButtonText,
       countdownSeconds: form.countdownSeconds,
       badges: form.badges,
       variants: form.variants,
@@ -227,6 +239,9 @@ export default function Setup() {
         secondaryButtonBorder: p.secondaryButtonBorder || "1px solid #0f0f0f",
         headerBgColor: p.headerBgColor,
         headerBgImage: p.headerBgImage || "",
+        headerLogoHeight: p.headerLogoHeight || "18px",
+        headerAlignment: p.headerAlignment || "center",
+        headerSubtextColor: p.headerSubtextColor || "",
         confirmationText: p.confirmationText,
         customFonts: p.customFonts || [],
         logoColor: p.logoColor || "#1a1a1a",
@@ -239,6 +254,7 @@ export default function Setup() {
         productDiscount: a.productDiscount || "",
         productDescription: a.productDescription || "",
         ctaButtonText: a.ctaButtonText,
+        declineButtonText: a.declineButtonText || "Decline offer",
         countdownSeconds: a.countdownSeconds,
         badges: a.badges,
         variants: a.variants,
@@ -270,6 +286,9 @@ export default function Setup() {
         logoColor: data.logoColor || null,
         headerBgColor: data.headerBgColor,
         headerBgImage: data.headerBgImage || null,
+        headerLogoHeight: data.headerLogoHeight,
+        headerAlignment: data.headerAlignment,
+        headerSubtextColor: data.headerSubtextColor || null,
         checkoutHtml: data.checkoutHtml || null,
         confirmationHtml: data.confirmationHtml || null,
         confirmationText: data.confirmationText,
@@ -282,6 +301,7 @@ export default function Setup() {
         productDiscount: data.productDiscount || null,
         productDescription: data.productDescription || null,
         ctaButtonText: data.ctaButtonText,
+        declineButtonText: data.declineButtonText,
         countdownSeconds: data.countdownSeconds,
         badges: data.badges,
         variants: data.variants,
@@ -739,7 +759,7 @@ export default function Setup() {
                 The original site header is stripped from uploaded HTML and replaced with a clean
                 static header using your uploaded partner logo.
               </p>
-              <div className="grid grid-cols-2 gap-4 max-w-sm">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="flex flex-col gap-1.5">
                   <Label className="text-xs">Header Background</Label>
                   <div className="flex gap-2 items-center">
@@ -757,16 +777,88 @@ export default function Setup() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <Label className="text-xs">Logo Preview</Label>
+                  <Label className="text-xs">Alignment</Label>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => setForm((prev) => ({ ...prev, headerAlignment: "center" }))}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded border text-xs cursor-pointer transition-colors ${
+                        form.headerAlignment === "center"
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-white border-border hover:bg-muted"
+                      }`}
+                    >
+                      <AlignCenter className="w-3.5 h-3.5" />
+                      Center
+                    </button>
+                    <button
+                      onClick={() => setForm((prev) => ({ ...prev, headerAlignment: "left" }))}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded border text-xs cursor-pointer transition-colors ${
+                        form.headerAlignment === "left"
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-white border-border hover:bg-muted"
+                      }`}
+                    >
+                      <AlignLeft className="w-3.5 h-3.5" />
+                      Left
+                    </button>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label className="text-xs">Logo Height</Label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="range"
+                      min={12}
+                      max={48}
+                      value={parseInt(form.headerLogoHeight) || 18}
+                      onChange={(e) => setForm((prev) => ({ ...prev, headerLogoHeight: `${e.target.value}px` }))}
+                      className="flex-1 accent-primary cursor-pointer"
+                    />
+                    <span className="text-xs text-muted-foreground font-mono w-10 text-right">
+                      {parseInt(form.headerLogoHeight) || 18}px
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label className="text-xs">Subtext Color</Label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="color"
+                      value={form.headerSubtextColor || "#c4c4c4"}
+                      onChange={(e) => setForm((prev) => ({ ...prev, headerSubtextColor: e.target.value }))}
+                      className="w-10 h-10 rounded border cursor-pointer shrink-0"
+                    />
+                    <Input
+                      value={form.headerSubtextColor || ""}
+                      onChange={(e) => setForm((prev) => ({ ...prev, headerSubtextColor: e.target.value }))}
+                      placeholder="Auto"
+                      className="text-xs font-mono"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5 col-span-2">
+                  <Label className="text-xs">Preview</Label>
                   <div
-                    className="h-10 rounded border flex items-center justify-center px-3"
-                    style={{ backgroundColor: form.headerBgColor }}
+                    className="h-14 rounded border flex flex-col gap-1 px-4"
+                    style={{
+                      backgroundColor: form.headerBgColor,
+                      alignItems: form.headerAlignment === "left" ? "flex-start" : "center",
+                      justifyContent: "center",
+                    }}
                   >
                     {form.logo ? (
-                      <img src={form.logo} alt="Logo" className="max-h-6 w-auto" />
+                      <img
+                        src={form.logo}
+                        alt="Logo"
+                        className="w-auto object-contain"
+                        style={{ height: form.headerLogoHeight || "18px" }}
+                      />
                     ) : (
                       <span className="text-[10px] text-muted-foreground">No logo uploaded</span>
                     )}
+                    <span className="text-[10px]" style={{ color: form.headerSubtextColor || "#c4c4c4" }}>
+                      In partnership with Brand
+                    </span>
                   </div>
                 </div>
               </div>
@@ -793,6 +885,7 @@ export default function Setup() {
                 productImage: form.productImage,
                 productImages: form.productImages,
                 ctaButtonText: form.ctaButtonText,
+                declineButtonText: form.declineButtonText,
                 countdownSeconds: form.countdownSeconds,
                 badges: form.badges,
                 soldBy: form.soldBy,
